@@ -2,6 +2,8 @@ package pvr
 
 import (
 	"fmt"
+	"github.com/antonmedv/expr"
+	"github.com/antonmedv/expr/vm"
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
@@ -21,6 +23,9 @@ type Radarr struct {
 	apiUrl           string
 	reqHeaders       req.Header
 	qualityProfileId int
+
+	ignoresExpr []*vm.Program
+	acceptsExpr []*vm.Program
 }
 
 type RadarrSystemStatus struct {
@@ -88,6 +93,32 @@ func (p *Radarr) getSystemStatus() (*RadarrSystemStatus, error) {
 	return &s, nil
 }
 
+func (p *Radarr) compileExpressions() error {
+	exprEnv := &config.MediaItem{}
+
+	// compile ignores
+	for _, ignoreExpr := range p.cfg.Filters.Ignores {
+		program, err := expr.Compile(ignoreExpr, expr.Env(exprEnv), expr.AsBool())
+		if err != nil {
+			return errors.Wrapf(err, "failed compiling ignore expression for: %q", ignoreExpr)
+		}
+
+		p.ignoresExpr = append(p.ignoresExpr, program)
+	}
+
+	// compile accepts
+	for _, acceptExpr := range p.cfg.Filters.Accepts {
+		program, err := expr.Compile(acceptExpr, expr.Env(exprEnv), expr.AsBool())
+		if err != nil {
+			return errors.Wrapf(err, "failed compiling accept expression for: %q", acceptExpr)
+		}
+
+		p.acceptsExpr = append(p.acceptsExpr, program)
+	}
+
+	return nil
+}
+
 /* Interface Implements */
 
 func (p *Radarr) Init(mediaType MediaType) error {
@@ -97,6 +128,11 @@ func (p *Radarr) Init(mediaType MediaType) error {
 		break
 	default:
 		return errors.New("unsupported media type")
+	}
+
+	// compile and validate filter expressions
+	if err := p.compileExpressions(); err != nil {
+		return err
 	}
 
 	// retrieve system status
