@@ -25,7 +25,6 @@ type Sonarr struct {
 	qualityProfileId int
 
 	ignoresExpr []*vm.Program
-	acceptsExpr []*vm.Program
 }
 
 type SonarrSystemStatus struct {
@@ -105,16 +104,6 @@ func (p *Sonarr) compileExpressions() error {
 		p.ignoresExpr = append(p.ignoresExpr, program)
 	}
 
-	// compile accepts
-	for _, acceptExpr := range p.cfg.Filters.Accepts {
-		program, err := expr.Compile(acceptExpr, expr.Env(exprEnv), expr.AsBool())
-		if err != nil {
-			return errors.Wrapf(err, "failed compiling accept expression for: %q", acceptExpr)
-		}
-
-		p.acceptsExpr = append(p.acceptsExpr, program)
-	}
-
 	return nil
 }
 
@@ -177,26 +166,6 @@ func (p *Sonarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 
 		if expResult {
 			p.log.Tracef("Ignoring: %+v", mediaItem)
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-func (p *Sonarr) ShouldAccept(mediaItem *config.MediaItem) (bool, error) {
-	for _, expression := range p.acceptsExpr {
-		result, err := expr.Run(expression, mediaItem)
-		if err != nil {
-			return false, errors.Wrapf(err, "failed checking accept expression")
-		}
-
-		expResult, ok := result.(bool)
-		if !ok {
-			return false, errors.New("failed type asserting accept expression result")
-		}
-
-		if expResult {
 			return true, nil
 		}
 	}

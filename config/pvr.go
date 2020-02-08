@@ -10,5 +10,4 @@ type Pvr struct {
 
 type PvrFilters struct {
 	Ignores []string
-	Accepts []string
 }
