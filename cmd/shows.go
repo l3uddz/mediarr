@@ -58,9 +58,21 @@ var showsCmd = &cobra.Command{
 		log.WithField("new_media_items", newMediaItemsSize).Info("Pruned existing media items from provider items")
 
 		// iterate items evaluating against filters
-		//for _, mediaItem := range newMediaItems {
-		//	log.Infof("%+v", mediaItem)
-		//}
+		for _, mediaItem := range newMediaItems {
+			// ignore this item?
+			ignore, err := pvr.ShouldIgnore(&mediaItem)
+			if err != nil {
+				log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)
+				continue
+			}
+
+			if ignore {
+				log.Debugf("Ignoring: %+v", mediaItem)
+				continue
+			}
+
+			log.Infof("Accepted: %+v", mediaItem)
+		}
 	},
 }
 

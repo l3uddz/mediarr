@@ -166,7 +166,6 @@ func (p *Radarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 		}
 
 		if expResult {
-			p.log.Tracef("Ignoring: %+v", mediaItem)
 			return true, nil
 		}
 	}
@@ -233,12 +232,12 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 
 		if item.ImdbId != "" {
 			existingMediaItems[item.ImdbId] = config.MediaItem{
-				Provider: "radarr",
-				Id:       item.ImdbId,
-				Name:     item.Title,
-				Date:     time.Time{},
-				Genre:    nil,
-				Language: nil,
+				Provider:  "radarr",
+				ImdbId:    item.ImdbId,
+				Title:     item.Title,
+				Date:      time.Time{},
+				Genres:    nil,
+				Languages: nil,
 			}
 
 			added = true
@@ -247,12 +246,12 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 		if item.TmdbId > 0 {
 			tmdbId := strconv.Itoa(item.TmdbId)
 			existingMediaItems[tmdbId] = config.MediaItem{
-				Provider: "radarr",
-				Id:       tmdbId,
-				Name:     item.Title,
-				Date:     time.Time{},
-				Genre:    nil,
-				Language: nil,
+				Provider:  "radarr",
+				TmdbId:    tmdbId,
+				Title:     item.Title,
+				Date:      time.Time{},
+				Genres:    nil,
+				Languages: nil,
 			}
 
 			added = true

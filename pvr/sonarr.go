@@ -165,7 +165,6 @@ func (p *Sonarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 		}
 
 		if expResult {
-			p.log.Tracef("Ignoring: %+v", mediaItem)
 			return true, nil
 		}
 	}
@@ -232,12 +231,12 @@ func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 
 		itemId := strconv.Itoa(item.TvdbId)
 		existingMediaItems[itemId] = config.MediaItem{
-			Provider: "sonarr",
-			Id:       itemId,
-			Name:     item.Title,
-			Date:     time.Time{},
-			Genre:    nil,
-			Language: nil,
+			Provider:  "sonarr",
+			TvdbId:    itemId,
+			Title:     item.Title,
+			Date:      time.Time{},
+			Genres:    nil,
+			Languages: nil,
 		}
 	}
 

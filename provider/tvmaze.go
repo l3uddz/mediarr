@@ -165,14 +165,16 @@ func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 		itemsSize += 1
 
 		mediaItems[itemId] = config.MediaItem{
-			Provider: "tvmaze",
-			Id:       itemId,
-			Name:     item.Embedded.Show.Name,
-			Network:  item.Embedded.Show.Network.Name,
-			Date:     date,
-			Runtime:  item.Runtime,
-			Language: []string{item.Embedded.Show.Language},
-			Genre:    []string{item.Embedded.Show.Type},
+			Provider:  "tvmaze",
+			TvdbId:    itemId,
+			ImdbId:    item.Embedded.Show.Externals.Imdb,
+			Title:     item.Embedded.Show.Name,
+			Network:   item.Embedded.Show.Network.Name,
+			Date:      date,
+			Year:      date.Year(),
+			Runtime:   item.Runtime,
+			Languages: []string{item.Embedded.Show.Language},
+			Genres:    []string{item.Embedded.Show.Type},
 		}
 	}
 
