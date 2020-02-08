@@ -135,6 +135,11 @@ func (p *TvMaze) GetShows() error {
 	mediaItems := make(map[string]MediaItem, 0)
 
 	for _, item := range s {
+		// skip invalid items
+		if item.Embedded.Show.Externals.Thetvdb < 1 {
+			continue
+		}
+
 		itemId := strconv.Itoa(item.Embedded.Show.Externals.Thetvdb)
 
 		// skip non-english language shows
