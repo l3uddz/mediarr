@@ -36,8 +36,9 @@ var (
 	pvrConfig    *config.Pvr
 	pvr          pvrObj.Interface
 
-	providerName string
-	provider     providerObj.Interface
+	providerName      string
+	lowerProviderName string
+	provider          providerObj.Interface
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -121,7 +122,8 @@ func parseValidateInputs(args []string) error {
 
 	// set provider
 	providerName = args[1]
-	provider, err = providerObj.Get(providerName)
+	lowerProviderName = strings.ToLower(providerName)
+	provider, err = providerObj.Get(lowerProviderName)
 	if err != nil {
 		return errors.WithMessage(err, "failed loading provider object")
 	}
