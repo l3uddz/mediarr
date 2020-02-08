@@ -164,6 +164,47 @@ func (p *Radarr) Init(mediaType MediaType) error {
 	return nil
 }
 
+func (p *Radarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
+	for _, expression := range p.ignoresExpr {
+		result, err := expr.Run(expression, mediaItem)
+		if err != nil {
+			return true, errors.Wrap(err, "failed checking ignore expression")
+		}
+
+		expResult, ok := result.(bool)
+		if !ok {
+			return true, errors.New("failed type asserting ignore expression result")
+		}
+
+		if expResult {
+			p.log.Tracef("Ignoring: %+v", mediaItem)
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (p *Radarr) ShouldAccept(mediaItem *config.MediaItem) (bool, error) {
+	for _, expression := range p.acceptsExpr {
+		result, err := expr.Run(expression, mediaItem)
+		if err != nil {
+			return false, errors.Wrapf(err, "failed checking accept expression")
+		}
+
+		expResult, ok := result.(bool)
+		if !ok {
+			return false, errors.New("failed type asserting accept expression result")
+		}
+
+		if expResult {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), 15, p.reqHeaders,
