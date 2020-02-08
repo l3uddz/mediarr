@@ -26,7 +26,7 @@ var (
 type MediaItem struct {
 	Id       string
 	Name     string
-	Date     string
+	Date     time.Time
 	Genre    []string
 	Language []string
 }

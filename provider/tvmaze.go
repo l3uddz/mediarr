@@ -152,11 +152,18 @@ func (p *TvMaze) GetShows() error {
 			continue
 		}
 
+		// parse premier date
+		date, err := time.Parse("2006-01-02", item.Embedded.Show.Premiered)
+		if err != nil {
+			p.log.WithError(err).Tracef("Failed parsing premier date for item: %+v", item)
+			continue
+		}
+
 		// add item
 		mediaItems[itemId] = MediaItem{
 			Id:       itemId,
 			Name:     item.Embedded.Show.Name,
-			Date:     item.Embedded.Show.Premiered,
+			Date:     date,
 			Language: []string{item.Embedded.Show.Language},
 			Genre:    []string{item.Embedded.Show.Type},
 		}
