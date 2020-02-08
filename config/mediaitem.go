@@ -8,6 +8,7 @@ type MediaItem struct {
 	Name     string
 	Network  string
 	Date     time.Time
+	Runtime  int
 	Genre    []string
 	Language []string
 }
