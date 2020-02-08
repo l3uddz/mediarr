@@ -122,7 +122,7 @@ func (p *Sonarr) Init(mediaType MediaType) error {
 		p.log.WithFields(logrus.Fields{
 			"quality_name": p.cfg.QualityProfile,
 			"quality_id":   p.qualityProfileId,
-		}).Info("Found quality profile id")
+		}).Info("Found quality profile")
 	}
 
 	return nil
