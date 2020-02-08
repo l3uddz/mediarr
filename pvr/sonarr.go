@@ -5,10 +5,13 @@ import (
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
+	"github.com/l3uddz/mediarr/provider"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strconv"
 	"strings"
+	"time"
 )
 
 /* Structs */
@@ -28,6 +31,12 @@ type SonarrSystemStatus struct {
 type SonarrQualityProfiles struct {
 	Name string
 	Id   int
+}
+
+type SonarrSeries struct {
+	Title  string
+	Status string
+	TvdbId int
 }
 
 /* Initializer */
@@ -147,4 +156,41 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	}
 
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
+}
+
+func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
+	// send request
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 15, p.reqHeaders,
+		&pvrDefaultRetry)
+	if err != nil {
+		return nil, errors.New("failed retrieving series api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 {
+		return nil, fmt.Errorf("failed retrieving valid series api response: %s", resp.Response().Status)
+	}
+
+	// decode response
+	var s []SonarrSeries
+	if err := resp.ToJSON(&s); err != nil {
+		return nil, errors.WithMessage(err, "failed decoding series api response")
+	}
+
+	// parse response
+	existingMediaItems := make(map[string]provider.MediaItem, 0)
+
+	for _, item := range s {
+		itemId := strconv.Itoa(item.TvdbId)
+		existingMediaItems[itemId] = provider.MediaItem{
+			Id:       itemId,
+			Name:     item.Title,
+			Date:     time.Time{},
+			Genre:    nil,
+			Language: nil,
+		}
+	}
+
+	return existingMediaItems, nil
 }

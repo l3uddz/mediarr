@@ -5,10 +5,12 @@ import (
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
+	"github.com/l3uddz/mediarr/provider"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"strings"
+	"time"
 )
 
 /* Structs */
@@ -23,6 +25,17 @@ type Radarr struct {
 
 type RadarrSystemStatus struct {
 	Version string
+}
+
+type RadarrQualityProfiles struct {
+	Name string
+	Id   int
+}
+
+type RadarrMovies struct {
+	Title  string
+	Status string
+	ImdbId string
 }
 
 /* Initializer */
@@ -129,7 +142,7 @@ func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	}
 
 	// decode response
-	var s []SonarrQualityProfiles
+	var s []RadarrQualityProfiles
 	if err := resp.ToJSON(&s); err != nil {
 		return 0, errors.WithMessage(err, "failed decoding quality profiles api response")
 	}
@@ -142,4 +155,40 @@ func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	}
 
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
+}
+
+func (p *Radarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
+	// send request
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movies"), 15, p.reqHeaders,
+		&pvrDefaultRetry)
+	if err != nil {
+		return nil, errors.New("failed retrieving movies api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 {
+		return nil, fmt.Errorf("failed retrieving valid movies api response: %s", resp.Response().Status)
+	}
+
+	// decode response
+	var s []RadarrMovies
+	if err := resp.ToJSON(&s); err != nil {
+		return nil, errors.WithMessage(err, "failed decoding movies api response")
+	}
+
+	// parse response
+	existingMediaItems := make(map[string]provider.MediaItem, 0)
+
+	for _, item := range s {
+		existingMediaItems[item.ImdbId] = provider.MediaItem{
+			Id:       item.ImdbId,
+			Name:     item.Title,
+			Date:     time.Time{},
+			Genre:    nil,
+			Language: nil,
+		}
+	}
+
+	return existingMediaItems, nil
 }

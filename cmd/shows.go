@@ -37,8 +37,16 @@ var showsCmd = &cobra.Command{
 
 		// retrieve media
 		if err := provider.GetShows(); err != nil {
-			log.WithError(err).Fatalf("Failed retrieving shows from provider")
+			log.WithError(err).Fatal("Failed retrieving shows from provider")
 		}
+
+		// get existing media
+		existingMedia, err := pvr.GetExistingMedia()
+		if err != nil {
+			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
+		}
+
+		log.Infof("Retrieved existing media items: %d", len(existingMedia))
 
 	},
 }
