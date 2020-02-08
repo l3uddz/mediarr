@@ -36,6 +36,9 @@ var showsCmd = &cobra.Command{
 		}
 
 		// retrieve media
+		if err := provider.GetShows(); err != nil {
+			log.WithError(err).Fatalf("Failed retrieving shows from provider")
+		}
 
 	},
 }
