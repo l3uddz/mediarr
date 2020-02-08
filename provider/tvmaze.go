@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
@@ -111,28 +112,29 @@ func (p *TvMaze) Init(mediaType MediaType) error {
 	return nil
 }
 
-func (p *TvMaze) GetShows() error {
+func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
 		&providerDefaultRetry)
 	if err != nil {
-		return errors.New("failed retrieving full schedule api response")
+		return nil, errors.New("failed retrieving full schedule api response")
 	}
 	defer resp.Response().Body.Close()
 
 	// validate response
 	if resp.Response().StatusCode != 200 {
-		return fmt.Errorf("failed retrieving valid full schedule api response: %s", resp.Response().Status)
+		return nil, fmt.Errorf("failed retrieving valid full schedule api response: %s", resp.Response().Status)
 	}
 
 	// decode response
 	var s []TvMazeScheduleItem
 	if err := resp.ToJSON(&s); err != nil {
-		return errors.WithMessage(err, "failed decoding full schedule api response")
+		return nil, errors.WithMessage(err, "failed decoding full schedule api response")
 	}
 
 	// process response
-	mediaItems := make(map[string]MediaItem, 0)
+	mediaItems := make(map[string]config.MediaItem, 0)
+	itemsSize := 0
 
 	for _, item := range s {
 		// skip invalid items
@@ -160,16 +162,18 @@ func (p *TvMaze) GetShows() error {
 		}
 
 		// add item
-		mediaItems[itemId] = MediaItem{
+		itemsSize += 1
+
+		mediaItems[itemId] = config.MediaItem{
 			Id:       itemId,
 			Name:     item.Embedded.Show.Name,
+			Network:  item.Embedded.Show.Network.Name,
 			Date:     date,
 			Language: []string{item.Embedded.Show.Language},
 			Genre:    []string{item.Embedded.Show.Type},
 		}
 	}
 
-	p.log.Info(mediaItems)
-	p.log.WithField("shows", len(mediaItems)).Info("Found shows")
-	return nil
+	p.log.WithField("shows", itemsSize).Info("Retrieved media items")
+	return mediaItems, nil
 }

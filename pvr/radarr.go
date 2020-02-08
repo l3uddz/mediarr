@@ -5,7 +5,6 @@ import (
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
-	"github.com/l3uddz/mediarr/provider"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -159,7 +158,7 @@ func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
 }
 
-func (p *Radarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
+func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movies"), 60, p.reqHeaders,
 		&pvrDefaultRetry)
@@ -180,34 +179,42 @@ func (p *Radarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 	}
 
 	// parse response
-	existingMediaItems := make(map[string]provider.MediaItem, 0)
-	itemsCount := 0
+	existingMediaItems := make(map[string]config.MediaItem, 0)
+	itemsSize := 0
 
 	for _, item := range s {
-		itemsCount += 1
+		added := false
 
 		if item.ImdbId != "" {
-			existingMediaItems[item.ImdbId] = provider.MediaItem{
+			existingMediaItems[item.ImdbId] = config.MediaItem{
 				Id:       item.ImdbId,
 				Name:     item.Title,
 				Date:     time.Time{},
 				Genre:    nil,
 				Language: nil,
 			}
+
+			added = true
 		}
 
 		if item.TmdbId > 0 {
 			tmdbId := strconv.Itoa(item.TmdbId)
-			existingMediaItems[tmdbId] = provider.MediaItem{
+			existingMediaItems[tmdbId] = config.MediaItem{
 				Id:       tmdbId,
 				Name:     item.Title,
 				Date:     time.Time{},
 				Genre:    nil,
 				Language: nil,
 			}
+
+			added = true
+		}
+
+		if added {
+			itemsSize += 1
 		}
 	}
 
-	p.log.WithField("movies", itemsCount).Info("Retrieved existing media")
+	p.log.WithField("movies", itemsSize).Info("Retrieved media items")
 	return existingMediaItems, nil
 }

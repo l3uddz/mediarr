@@ -21,16 +21,6 @@ var (
 	}
 )
 
-/* Common Struct */
-
-type MediaItem struct {
-	Id       string
-	Name     string
-	Date     time.Time
-	Genre    []string
-	Language []string
-}
-
 /* Public */
 
 func Get(providerType string) (Interface, error) {

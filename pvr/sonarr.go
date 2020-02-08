@@ -5,7 +5,6 @@ import (
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
-	"github.com/l3uddz/mediarr/provider"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -158,7 +157,7 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
 }
 
-func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
+func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,
 		&pvrDefaultRetry)
@@ -179,11 +178,14 @@ func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 	}
 
 	// parse response
-	existingMediaItems := make(map[string]provider.MediaItem, 0)
+	existingMediaItems := make(map[string]config.MediaItem, 0)
+	itemsSize := 0
 
 	for _, item := range s {
+		itemsSize += 1
+
 		itemId := strconv.Itoa(item.TvdbId)
-		existingMediaItems[itemId] = provider.MediaItem{
+		existingMediaItems[itemId] = config.MediaItem{
 			Id:       itemId,
 			Name:     item.Title,
 			Date:     time.Time{},
@@ -192,6 +194,6 @@ func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 		}
 	}
 
-	p.log.WithField("shows", len(existingMediaItems)).Info("Retrieved existing media")
+	p.log.WithField("shows", itemsSize).Info("Retrieved media items")
 	return existingMediaItems, nil
 }

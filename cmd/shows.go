@@ -4,6 +4,7 @@ import (
 	"github.com/l3uddz/mediarr/database"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
+	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
 )
 
@@ -35,17 +36,26 @@ var showsCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing pvr object for: %s", pvrName)
 		}
 
-		// retrieve media
-		if err := provider.GetShows(); err != nil {
-			log.WithError(err).Fatal("Failed retrieving shows from provider")
-		}
-
 		// get existing media
-		_, err := pvr.GetExistingMedia()
+		existingMediaItems, err := pvr.GetExistingMedia()
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
 		}
 
+		// retrieve media
+		foundMediaItems, err := provider.GetShows()
+		if err != nil {
+			log.WithError(err).Fatal("Failed retrieving media from provider")
+		}
+
+		// remove existing media items
+		newMediaItems, err := media.PruneExistingMedia(existingMediaItems, foundMediaItems)
+		if err != nil {
+			log.WithError(err).Fatal("Failed removing existing media from provider media items")
+		}
+
+		newMediaItemsSize := len(newMediaItems)
+		log.WithField("new_media_items", newMediaItemsSize).Info("Removed existing media items from providers")
 	},
 }
 

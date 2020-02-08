@@ -1,10 +1,12 @@
 package pvr
 
-import "github.com/l3uddz/mediarr/provider"
+import (
+	"github.com/l3uddz/mediarr/config"
+)
 
 type Interface interface {
 	Init(MediaType) error
 
 	GetQualityProfileId(string) (int, error)
-	GetExistingMedia() (map[string]provider.MediaItem, error)
+	GetExistingMedia() (map[string]config.MediaItem, error)
 }
