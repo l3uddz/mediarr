@@ -186,6 +186,7 @@ func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 
 		itemId := strconv.Itoa(item.TvdbId)
 		existingMediaItems[itemId] = config.MediaItem{
+			Provider: "sonarr",
 			Id:       itemId,
 			Name:     item.Title,
 			Date:     time.Time{},

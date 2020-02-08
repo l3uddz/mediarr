@@ -187,6 +187,7 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 
 		if item.ImdbId != "" {
 			existingMediaItems[item.ImdbId] = config.MediaItem{
+				Provider: "radarr",
 				Id:       item.ImdbId,
 				Name:     item.Title,
 				Date:     time.Time{},
@@ -200,6 +201,7 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 		if item.TmdbId > 0 {
 			tmdbId := strconv.Itoa(item.TmdbId)
 			existingMediaItems[tmdbId] = config.MediaItem{
+				Provider: "radarr",
 				Id:       tmdbId,
 				Name:     item.Title,
 				Date:     time.Time{},

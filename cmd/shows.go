@@ -55,7 +55,12 @@ var showsCmd = &cobra.Command{
 		}
 
 		newMediaItemsSize := len(newMediaItems)
-		log.WithField("new_media_items", newMediaItemsSize).Info("Removed existing media items from providers")
+		log.WithField("new_media_items", newMediaItemsSize).Info("Pruned existing media items from provider items")
+
+		// iterate items evaluating against filters
+		//for _, mediaItem := range newMediaItems {
+		//	log.Infof("%+v", mediaItem)
+		//}
 	},
 }
 
