@@ -122,7 +122,7 @@ func (p *Sonarr) Init(mediaType MediaType) error {
 		p.log.WithFields(logrus.Fields{
 			"quality_name": p.cfg.QualityProfile,
 			"quality_id":   p.qualityProfileId,
-		}).Debugf("Found quality profile id")
+		}).Info("Found quality profile id")
 	}
 
 	return nil
@@ -160,7 +160,7 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 
 func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 15, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving series api response")
@@ -192,5 +192,6 @@ func (p *Sonarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 		}
 	}
 
+	p.log.WithField("shows", len(existingMediaItems)).Info("Retrieved existing media")
 	return existingMediaItems, nil
 }

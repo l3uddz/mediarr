@@ -41,12 +41,10 @@ var showsCmd = &cobra.Command{
 		}
 
 		// get existing media
-		existingMedia, err := pvr.GetExistingMedia()
+		_, err := pvr.GetExistingMedia()
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
 		}
-
-		log.Infof("Retrieved existing media items: %d", len(existingMedia))
 
 	},
 }
