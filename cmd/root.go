@@ -5,6 +5,7 @@ import (
 	"github.com/l3uddz/mediarr/build"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
+	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
 	"github.com/l3uddz/mediarr/utils/paths"
 	stringutils "github.com/l3uddz/mediarr/utils/strings"
@@ -27,12 +28,16 @@ var (
 	flagRefreshCache = false
 
 	// Global vars
-	pvrName         string
-	lowerPvrName    string
-	pvrConfig       *config.Pvr
-	pvr             pvrObj.Interface
 	log             *logrus.Entry
 	continueRunning *atomic.Bool
+
+	pvrName      string
+	lowerPvrName string
+	pvrConfig    *config.Pvr
+	pvr          pvrObj.Interface
+
+	providerName string
+	provider     providerObj.Interface
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -108,10 +113,17 @@ func parseValidateInputs(args []string) error {
 		return fmt.Errorf("no pvr configuration found for: %q", pvrName)
 	}
 
-	// init pvrObj
+	// set pvr
 	pvr, err = pvrObj.Get(pvrName, pvrConfig.Type, pvrConfig)
 	if err != nil {
 		return errors.WithMessage(err, "failed loading pvr object")
+	}
+
+	// set provider
+	providerName = args[1]
+	provider, err = providerObj.Get(providerName)
+	if err != nil {
+		return errors.WithMessage(err, "failed loading provider object")
 	}
 
 	return nil
