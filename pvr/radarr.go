@@ -9,6 +9,7 @@ import (
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -36,6 +37,7 @@ type RadarrMovies struct {
 	Title  string
 	Status string
 	ImdbId string
+	TmdbId int
 }
 
 /* Initializer */
@@ -181,13 +183,27 @@ func (p *Radarr) GetExistingMedia() (map[string]provider.MediaItem, error) {
 	existingMediaItems := make(map[string]provider.MediaItem, 0)
 
 	for _, item := range s {
-		existingMediaItems[item.ImdbId] = provider.MediaItem{
-			Id:       item.ImdbId,
-			Name:     item.Title,
-			Date:     time.Time{},
-			Genre:    nil,
-			Language: nil,
+		if item.ImdbId != "" {
+			existingMediaItems[item.ImdbId] = provider.MediaItem{
+				Id:       item.ImdbId,
+				Name:     item.Title,
+				Date:     time.Time{},
+				Genre:    nil,
+				Language: nil,
+			}
 		}
+
+		if item.TmdbId > 0 {
+			tmdbId := strconv.Itoa(item.TmdbId)
+			existingMediaItems[tmdbId] = provider.MediaItem{
+				Id:       tmdbId,
+				Name:     item.Title,
+				Date:     time.Time{},
+				Genre:    nil,
+				Language: nil,
+			}
+		}
+
 	}
 
 	return existingMediaItems, nil
