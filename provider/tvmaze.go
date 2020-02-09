@@ -106,7 +106,7 @@ func NewTvMaze() *TvMaze {
 		apiKey: "",
 
 		supportedShowsSearchTypes: []string{
-			SEARCH_TYPE_SCHEDULE,
+			SearchTypeSchedule,
 		},
 		supportedMoviesSearchTypes: []string{},
 	}
@@ -117,7 +117,7 @@ func NewTvMaze() *TvMaze {
 func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	// validate we support this media type
 	switch mediaType {
-	case SHOW:
+	case Show:
 		break
 	default:
 		return errors.New("unsupported media type")
@@ -148,12 +148,30 @@ func (p *TvMaze) SupportsMoviesSearchType(searchType string) bool {
 	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
 }
 
-func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
+func (p *TvMaze) GetShows(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+
+	switch searchType {
+	case SearchTypeSchedule:
+		return p.getScheduleShows(params)
+	default:
+		break
+	}
+
+	return nil, fmt.Errorf("unsupported search_type: %q", searchType)
+}
+
+func (p *TvMaze) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+	return nil, errors.New("unsupported media type")
+}
+
+/* Private - Sub-Implements */
+
+func (p *TvMaze) getScheduleShows(params map[string]string) (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
 		&providerDefaultRetry, p.rl)
 	if err != nil {
-		return nil, errors.WithMessage(err,"failed retrieving full schedule api response")
+		return nil, errors.WithMessage(err, "failed retrieving full schedule api response")
 	}
 	defer resp.Response().Body.Close()
 
@@ -216,8 +234,4 @@ func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 
 	p.log.WithField("shows", itemsSize).Info("Retrieved media items")
 	return mediaItems, nil
-}
-
-func (p *TvMaze) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
-	return nil, errors.New("unsupported media type")
 }

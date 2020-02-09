@@ -3,11 +3,11 @@ package provider
 type MediaType int
 
 const (
-	SHOW MediaType = iota + 1
-	MOVIE
+	Show MediaType = iota + 1
+	Movie
 )
 
 const (
-	SEARCH_TYPE_SCHEDULE string = "schedule"
-	SEARCH_TYPE_NOW      string = "now_playing"
+	SearchTypeSchedule string = "schedule"
+	SearchTypeNow      string = "now_playing"
 )

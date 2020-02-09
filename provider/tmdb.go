@@ -77,45 +77,9 @@ func NewTmdb() *Tmdb {
 
 		supportedShowsSearchTypes: []string{},
 		supportedMoviesSearchTypes: []string{
-			SEARCH_TYPE_NOW,
+			SearchTypeNow,
 		},
 	}
-}
-
-/* Internals */
-
-func (p *Tmdb) loadGenres() error {
-	// set request params
-	params := req.Param{
-		"api_key": p.apiKey,
-	}
-
-	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), providerDefaultTimeout,
-		params, &providerDefaultTimeout, p.rl)
-	if err != nil {
-		return errors.WithMessage(err, "failed retrieving genres api response")
-	}
-	defer resp.Response().Body.Close()
-
-	// validate response
-	if resp.Response().StatusCode != 200 {
-		return fmt.Errorf("failed retrieving valid genres api response: %s", resp.Response().Status)
-	}
-
-	// decode response
-	var s TmdbGenreResponse
-	if err := resp.ToJSON(&s); err != nil {
-		return errors.WithMessage(err, "failed decoding genres api response")
-	}
-
-	// parse response
-	for _, genre := range s.Genres {
-		p.genres[genre.Id] = genre.Name
-	}
-
-	p.log.WithField("genres", len(p.genres)).Info("Retrieved genres")
-	return nil
 }
 
 /* Interface Implements */
@@ -123,7 +87,7 @@ func (p *Tmdb) loadGenres() error {
 func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	// validate we support this media type
 	switch mediaType {
-	case MOVIE:
+	case Movie:
 		break
 	default:
 		return errors.New("unsupported media type")
@@ -166,14 +130,14 @@ func (p *Tmdb) SupportsMoviesSearchType(searchType string) bool {
 	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
 }
 
-func (p *Tmdb) GetShows() (map[string]config.MediaItem, error) {
+func (p *Tmdb) GetShows(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
 	return nil, errors.New("unsupported media type")
 }
 
 func (p *Tmdb) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
 
 	switch searchType {
-	case SEARCH_TYPE_NOW:
+	case SearchTypeNow:
 		return p.getMoviesNowPlaying(params)
 	default:
 		break
@@ -184,7 +148,7 @@ func (p *Tmdb) GetMovies(searchType string, params map[string]string) (map[strin
 
 /* Private - Sub-Implements */
 
-func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.MediaItem, error) {
+func (p *Tmdb) getRequestParams(params map[string]string) req.Param {
 	// set request params
 	reqParams := req.Param{
 		"api_key": p.apiKey,
@@ -201,8 +165,52 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 			reqParams["region"] = v
 		case "language":
 			reqParams["language"] = v
+
+		default:
+			break
 		}
 	}
+
+	return reqParams
+}
+
+func (p *Tmdb) loadGenres() error {
+	// set request params
+	params := req.Param{
+		"api_key": p.apiKey,
+	}
+
+	// send request
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), providerDefaultTimeout,
+		params, &providerDefaultTimeout, p.rl)
+	if err != nil {
+		return errors.WithMessage(err, "failed retrieving genres api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 {
+		return fmt.Errorf("failed retrieving valid genres api response: %s", resp.Response().Status)
+	}
+
+	// decode response
+	var s TmdbGenreResponse
+	if err := resp.ToJSON(&s); err != nil {
+		return errors.WithMessage(err, "failed decoding genres api response")
+	}
+
+	// parse response
+	for _, genre := range s.Genres {
+		p.genres[genre.Id] = genre.Name
+	}
+
+	p.log.WithField("genres", len(p.genres)).Info("Retrieved genres")
+	return nil
+}
+
+func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.MediaItem, error) {
+	// set request params
+	reqParams := p.getRequestParams(params)
 
 	p.log.Tracef("Request params: %+v", params)
 

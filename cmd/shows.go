@@ -28,7 +28,7 @@ var showsCmd = &cobra.Command{
 		defer database.Close()
 
 		// init provider object
-		if err := provider.Init(providerObj.SHOW, providerCfg); err != nil {
+		if err := provider.Init(providerObj.Show, providerCfg); err != nil {
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
@@ -49,8 +49,14 @@ var showsCmd = &cobra.Command{
 			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
 		}
 
+		// build param map
+		params := map[string]string{
+			"country":  flagCountry,
+			"language": flagLanguage,
+		}
+
 		// retrieve media
-		foundMediaItems, err := provider.GetShows()
+		foundMediaItems, err := provider.GetShows(flagSearchType, params)
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving media from provider")
 		}
