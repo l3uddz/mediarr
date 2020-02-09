@@ -140,7 +140,7 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	}
 
 	// set ratelimiter
-	p.rl = web.GetRateLimiter("tmdb", 2)
+	p.rl = web.GetRateLimiter("tmdb", 3)
 
 	// load genres
 	if err := p.loadGenres(); err != nil {
@@ -268,7 +268,7 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 				Title:     item.Title,
 				Network:   "",
 				Date:      date,
-				Year:      0,
+				Year:      date.Year(),
 				Runtime:   0,
 				Genres:    genres,
 				Languages: []string{item.OriginalLanguage},
