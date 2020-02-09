@@ -132,19 +132,19 @@ func (p *Tmdb) SupportsMoviesSearchType(searchType string) bool {
 	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
 }
 
-func (p *Tmdb) GetShows(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *Tmdb) GetShows(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	return nil, errors.New("unsupported media type")
 }
 
-func (p *Tmdb) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *Tmdb) GetMovies(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 
 	switch searchType {
 	case SearchTypeNow:
-		return p.getMovies("/movie/now_playing", params)
+		return p.getMovies("/movie/now_playing", logic, params)
 	case SearchTypeUpcoming:
-		return p.getMovies("/movie/upcoming", params)
+		return p.getMovies("/movie/upcoming", logic, params)
 	case SearchTypePopular:
-		return p.getMovies("/movie/popular", params)
+		return p.getMovies("/movie/popular", logic, params)
 	default:
 		break
 	}
@@ -153,6 +153,14 @@ func (p *Tmdb) GetMovies(searchType string, params map[string]string) (map[strin
 }
 
 /* Private - Sub-Implements */
+
+func (p *Tmdb) getLogicParam(logic map[string]interface{}, key string) interface{} {
+	if v, exists := logic[key]; exists {
+		return v
+	}
+
+	return nil
+}
 
 func (p *Tmdb) getRequestParams(params map[string]string) req.Param {
 	// set request params
@@ -214,7 +222,7 @@ func (p *Tmdb) loadGenres() error {
 	return nil
 }
 
-func (p *Tmdb) getMovies(endpoint string, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	// set request params
 	reqParams := p.getRequestParams(params)
 
@@ -224,6 +232,14 @@ func (p *Tmdb) getMovies(endpoint string, params map[string]string) (map[string]
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	page := 1
+	pageTo := 0
+
+	if v := p.getLogicParam(logic, "page-from"); v != nil {
+		page = v.(int)
+	}
+	if v := p.getLogicParam(logic, "page-to"); v != nil {
+		pageTo = v.(int)
+	}
 
 	for {
 		// set params
@@ -305,6 +321,11 @@ func (p *Tmdb) getMovies(endpoint string, params map[string]string) (map[string]
 		}).Debug("Retrieved")
 
 		// loop logic
+
+		if pageTo > 0 && s.Page == pageTo {
+			break
+		}
+
 		if s.Page >= s.TotalPages {
 			break
 		} else {

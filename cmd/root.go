@@ -28,6 +28,8 @@ var (
 	flagRefreshCache = false
 
 	flagSearchType string
+	flagPageFrom   int
+	flagPageTo     int
 
 	flagCountry  string
 	flagLanguage string

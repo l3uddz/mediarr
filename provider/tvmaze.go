@@ -148,7 +148,7 @@ func (p *TvMaze) SupportsMoviesSearchType(searchType string) bool {
 	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
 }
 
-func (p *TvMaze) GetShows(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *TvMaze) GetShows(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 
 	switch searchType {
 	case SearchTypeSchedule:
@@ -160,7 +160,7 @@ func (p *TvMaze) GetShows(searchType string, params map[string]string) (map[stri
 	return nil, fmt.Errorf("unsupported search_type: %q", searchType)
 }
 
-func (p *TvMaze) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	return nil, errors.New("unsupported media type")
 }
 

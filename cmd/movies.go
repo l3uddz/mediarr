@@ -49,6 +49,12 @@ var moviesCmd = &cobra.Command{
 			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
 		}
 
+		// build logic map
+		logic := map[string]interface{}{
+			"page-from": flagPageFrom,
+			"page-to":   flagPageTo,
+		}
+
 		// build param map
 		params := map[string]string{
 			"country":  flagCountry,
@@ -56,7 +62,7 @@ var moviesCmd = &cobra.Command{
 		}
 
 		// retrieve media
-		foundMediaItems, err := provider.GetMovies(flagSearchType, params)
+		foundMediaItems, err := provider.GetMovies(flagSearchType, logic, params)
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving media from provider")
 		}
@@ -98,6 +104,9 @@ func init() {
 
 	// optional flags
 	moviesCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
+
+	moviesCmd.Flags().IntVar(&flagPageFrom, "page-from", 1, "Start from page.")
+	moviesCmd.Flags().IntVar(&flagPageTo, "page-to", 0, "Finish on page.")
 
 	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
 	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")
