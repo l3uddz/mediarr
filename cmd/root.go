@@ -28,8 +28,7 @@ var (
 	flagRefreshCache = false
 
 	flagSearchType string
-	flagPageFrom   int
-	flagPageTo     int
+	flagLimit      int
 
 	flagCountry  string
 	flagLanguage string
@@ -42,6 +41,8 @@ var (
 	lowerPvrName string
 	pvrConfig    *config.Pvr
 	pvr          pvrObj.Interface
+
+	existingMediaItems map[string]config.MediaItem
 
 	providerName      string
 	lowerProviderName string
@@ -147,4 +148,33 @@ func parseValidateInputs(args []string) error {
 	}
 
 	return nil
+}
+
+func shouldAcceptMediaItem(mediaItem *config.MediaItem) bool {
+	// item already exists in pvr?
+	if mediaItem.ImdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.ImdbId]; exists {
+			return false
+		}
+	}
+	if mediaItem.TmdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.TmdbId]; exists {
+			return false
+		}
+	}
+	if mediaItem.TvdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.TvdbId]; exists {
+			return false
+		}
+	}
+
+	// pvr should ignore this item?
+	if ignore, err := pvr.ShouldIgnore(mediaItem); err != nil {
+		log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)
+		return false
+	} else if ignore {
+		return false
+	}
+
+	return true
 }

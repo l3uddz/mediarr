@@ -4,7 +4,6 @@ import (
 	"github.com/l3uddz/mediarr/database"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
-	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -16,6 +15,8 @@ var showsCmd = &cobra.Command{
 
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
 		// validate inputs
 		if err := parseValidateInputs(args); err != nil {
 			log.WithError(err).Fatal("Failed validating inputs")
@@ -44,15 +45,15 @@ var showsCmd = &cobra.Command{
 		}
 
 		// get existing media
-		existingMediaItems, err := pvr.GetExistingMedia()
+		existingMediaItems, err = pvr.GetExistingMedia()
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving existing media from pvr")
 		}
 
 		// build logic map
 		logic := map[string]interface{}{
-			"page-from": flagPageFrom,
-			"page-to":   flagPageTo,
+			"limit":         flagLimit,
+			"want-callback": shouldAcceptMediaItem,
 		}
 
 		// build param map
@@ -67,29 +68,8 @@ var showsCmd = &cobra.Command{
 			log.WithError(err).Fatal("Failed retrieving media from provider")
 		}
 
-		// remove existing media items
-		newMediaItems, err := media.PruneExistingMedia(existingMediaItems, foundMediaItems)
-		if err != nil {
-			log.WithError(err).Fatal("Failed removing existing media from provider media items")
-		}
-
-		newMediaItemsSize := len(newMediaItems)
-		log.WithField("new_media_items", newMediaItemsSize).Info("Pruned existing media items from provider items")
-
-		// iterate items evaluating against filters
-		for _, mediaItem := range newMediaItems {
-			// ignore this item?
-			ignore, err := pvr.ShouldIgnore(&mediaItem)
-			if err != nil {
-				log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)
-				continue
-			}
-
-			if ignore {
-				log.Debugf("Ignoring: %+v", mediaItem)
-				continue
-			}
-
+		// iterate accepted items
+		for _, mediaItem := range foundMediaItems {
 			log.Infof("Accepted: %+v", mediaItem)
 		}
 	},
@@ -105,8 +85,7 @@ func init() {
 	// optional flags
 	showsCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
 
-	showsCmd.Flags().IntVar(&flagPageFrom, "page-from", 1, "Start from page.")
-	showsCmd.Flags().IntVar(&flagPageTo, "page-to", 0, "Finish on page.")
+	showsCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
 	showsCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
 	showsCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")

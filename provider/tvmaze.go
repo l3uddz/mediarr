@@ -152,7 +152,7 @@ func (p *TvMaze) GetShows(searchType string, logic map[string]interface{}, param
 
 	switch searchType {
 	case SearchTypeSchedule:
-		return p.getScheduleShows(params)
+		return p.getScheduleShows(logic, params)
 	default:
 		break
 	}
@@ -166,7 +166,7 @@ func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, para
 
 /* Private - Sub-Implements */
 
-func (p *TvMaze) getScheduleShows(params map[string]string) (map[string]config.MediaItem, error) {
+func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
 		&providerDefaultRetry, p.rl)
@@ -188,7 +188,19 @@ func (p *TvMaze) getScheduleShows(params map[string]string) (map[string]config.M
 
 	// process response
 	mediaItems := make(map[string]config.MediaItem, 0)
-	itemsSize := 0
+	mediaItemsSize := 0
+
+	// parse logic params
+	var wantCallback func(mediaItem *config.MediaItem) bool = nil
+	limit := 0
+
+	if v := getLogicParam(logic, "limit"); v != nil {
+		limit = v.(int)
+	}
+
+	if v := getLogicParam(logic, "want-callback"); v != nil {
+		wantCallback = v.(func(*config.MediaItem) bool)
+	}
 
 	for _, item := range s {
 		// skip invalid items
@@ -215,10 +227,8 @@ func (p *TvMaze) getScheduleShows(params map[string]string) (map[string]config.M
 			continue
 		}
 
-		// add item
-		itemsSize += 1
-
-		mediaItems[itemId] = config.MediaItem{
+		// init media item
+		mediaItem := config.MediaItem{
 			Provider:  "tvmaze",
 			TvdbId:    itemId,
 			ImdbId:    item.Embedded.Show.Externals.Imdb,
@@ -230,8 +240,26 @@ func (p *TvMaze) getScheduleShows(params map[string]string) (map[string]config.M
 			Languages: []string{item.Embedded.Show.Language},
 			Genres:    []string{item.Embedded.Show.Type},
 		}
+
+		// media item wanted?
+		if wantCallback != nil && !wantCallback(&mediaItem) {
+			p.log.Tracef("Ignoring: %+v", mediaItem)
+			continue
+		} else {
+			p.log.Debugf("Accepted: %+v", mediaItem)
+		}
+
+		// set item
+		mediaItems[itemId] = mediaItem
+		mediaItemsSize += 1
+
+		// stop when limit reached
+		if limit > 0 && mediaItemsSize >= limit {
+			// limit was supplied via cli and we have reached this limit
+			break
+		}
 	}
 
-	p.log.WithField("shows", itemsSize).Info("Retrieved media items")
+	p.log.WithField("accepted_items", mediaItemsSize).Info("Retrieved media items")
 	return mediaItems, nil
 }

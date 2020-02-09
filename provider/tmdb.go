@@ -154,14 +154,6 @@ func (p *Tmdb) GetMovies(searchType string, logic map[string]interface{}, params
 
 /* Private - Sub-Implements */
 
-func (p *Tmdb) getLogicParam(logic map[string]interface{}, key string) interface{} {
-	if v, exists := logic[key]; exists {
-		return v
-	}
-
-	return nil
-}
-
 func (p *Tmdb) getRequestParams(params map[string]string) req.Param {
 	// set request params
 	reqParams := req.Param{
@@ -228,18 +220,23 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 
 	p.log.Tracef("Request params: %+v", params)
 
+	// parse logic params
+	var wantCallback func(mediaItem *config.MediaItem) bool = nil
+	limit := 0
+	limitReached := false
+
+	if v := getLogicParam(logic, "limit"); v != nil {
+		limit = v.(int)
+	}
+
+	if v := getLogicParam(logic, "want-callback"); v != nil {
+		wantCallback = v.(func(*config.MediaItem) bool)
+	}
+
 	// fetch all page results
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	page := 1
-	pageTo := 0
-
-	if v := p.getLogicParam(logic, "page-from"); v != nil {
-		page = v.(int)
-	}
-	if v := p.getLogicParam(logic, "page-to"); v != nil {
-		pageTo = v.(int)
-	}
 
 	for {
 		// set params
@@ -296,8 +293,8 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				continue
 			}
 
-			// set item
-			mediaItems[itemId] = config.MediaItem{
+			// init media item
+			mediaItem := config.MediaItem{
 				Provider:  "tmdb",
 				TvdbId:    "",
 				TmdbId:    itemId,
@@ -311,18 +308,35 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				Languages: []string{item.OriginalLanguage},
 			}
 
+			// media item wanted?
+			if wantCallback != nil && !wantCallback(&mediaItem) {
+				p.log.Tracef("Ignoring: %+v", mediaItem)
+				continue
+			} else {
+				p.log.Debugf("Accepted: %+v", mediaItem)
+			}
+
+			// set media item
+			mediaItems[itemId] = mediaItem
 			mediaItemsSize += 1
 
+			// stop when limit reached
+			if limit > 0 && mediaItemsSize >= limit {
+				// limit was supplied via cli and we have reached this limit
+				limitReached = true
+				break
+			}
 		}
 
 		p.log.WithFields(logrus.Fields{
-			"page":  page,
-			"pages": s.TotalPages,
-		}).Debug("Retrieved")
+			"page":           page,
+			"pages":          s.TotalPages,
+			"accepted_items": mediaItemsSize,
+		}).Info("Retrieved")
 
 		// loop logic
-
-		if pageTo > 0 && s.Page == pageTo {
+		if limitReached {
+			// the limit has been reached for accepted items
 			break
 		}
 
@@ -333,6 +347,6 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 		}
 	}
 
-	p.log.WithField("movies", mediaItemsSize).Info("Retrieved media items")
+	p.log.WithField("accepted_items", mediaItemsSize).Info("Retrieved media items")
 	return mediaItems, nil
 }
