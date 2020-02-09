@@ -110,6 +110,7 @@ func parseValidateInputs(args []string) error {
 	// validate pvr exists in config
 	pvrName = args[0]
 	lowerPvrName = strings.ToLower(pvrName)
+
 	pvrConfig, ok = config.Config.Pvr[pvrName]
 	if !ok {
 		return fmt.Errorf("no pvr configuration found for: %q", pvrName)
@@ -125,16 +126,17 @@ func parseValidateInputs(args []string) error {
 	providerName = args[1]
 	lowerProviderName = strings.ToLower(providerName)
 
+	provider, err = providerObj.Get(lowerProviderName)
+	if err != nil {
+		return errors.WithMessage(err, "failed loading provider object")
+	}
+
+	// set provider config if exists
 	for pName, pCfg := range config.Config.Provider {
 		if strings.EqualFold(pName, providerName) {
 			providerCfg = pCfg
 			break
 		}
-	}
-
-	provider, err = providerObj.Get(lowerProviderName)
-	if err != nil {
-		return errors.WithMessage(err, "failed loading provider object")
 	}
 
 	return nil
