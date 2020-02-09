@@ -6,6 +6,7 @@ import (
 	pvrObj "github.com/l3uddz/mediarr/pvr"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var showsCmd = &cobra.Command{
@@ -34,6 +35,12 @@ var showsCmd = &cobra.Command{
 		// init pvr object
 		if err := pvr.Init(pvrObj.SHOW); err != nil {
 			log.WithError(err).Fatalf("Failed initializing pvr object for: %s", pvrName)
+		}
+
+		// validate provider supports search type
+		if supported := provider.SupportsShowsSearchType(flagSearchType); !supported {
+			log.WithField("search_type", flagSearchType).Fatalf("Unsupported search type, valid types: %s",
+				strings.Join(provider.GetShowsSearchTypes(), ", "))
 		}
 
 		// get existing media
@@ -79,5 +86,10 @@ var showsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(showsCmd)
 
+	// required flags
+	showsCmd.Flags().StringVarP(&flagSearchType, "search-type", "t", "", "Search type.")
+	_ = showsCmd.MarkFlagRequired("search-type")
+
+	// optional flags
 	showsCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
 }

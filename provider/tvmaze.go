@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
+	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,6 +23,9 @@ type TvMaze struct {
 	apiKey string
 
 	rl *ratelimit.Limiter
+
+	supportedShowsSearchTypes  []string
+	supportedMoviesSearchTypes []string
 }
 
 type TvMazeScheduleItem struct {
@@ -100,6 +104,11 @@ func NewTvMaze() *TvMaze {
 		cfg:    nil,
 		apiUrl: "http://api.tvmaze.com",
 		apiKey: "",
+
+		supportedShowsSearchTypes: []string{
+			SEARCH_TYPE_SCHEDULE,
+		},
+		supportedMoviesSearchTypes: []string{},
 	}
 }
 
@@ -121,6 +130,22 @@ func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	p.rl = web.GetRateLimiter("tvmaze", 2)
 
 	return nil
+}
+
+func (p *TvMaze) GetShowsSearchTypes() []string {
+	return p.supportedShowsSearchTypes
+}
+
+func (p *TvMaze) SupportsShowsSearchType(searchType string) bool {
+	return lists.StringListContains(p.supportedShowsSearchTypes, searchType, false)
+}
+
+func (p *TvMaze) GetMoviesSearchTypes() []string {
+	return p.supportedMoviesSearchTypes
+}
+
+func (p *TvMaze) SupportsMoviesSearchType(searchType string) bool {
+	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
 }
 
 func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
@@ -191,4 +216,8 @@ func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 
 	p.log.WithField("shows", itemsSize).Info("Retrieved media items")
 	return mediaItems, nil
+}
+
+func (p *TvMaze) GetMovies() (map[string]config.MediaItem, error) {
+	return nil, errors.New("unsupported media type")
 }

@@ -27,6 +27,8 @@ var (
 	flagLogFile      = "activity.log"
 	flagRefreshCache = false
 
+	flagSearchType string
+
 	// Global vars
 	log             *logrus.Entry
 	continueRunning *atomic.Bool

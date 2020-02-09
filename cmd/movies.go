@@ -6,6 +6,7 @@ import (
 	pvrObj "github.com/l3uddz/mediarr/pvr"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var moviesCmd = &cobra.Command{
@@ -15,7 +16,7 @@ var moviesCmd = &cobra.Command{
 
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		// validate inputs
+		// validate core inputs
 		if err := parseValidateInputs(args); err != nil {
 			log.WithError(err).Fatal("Failed validating inputs")
 		}
@@ -31,6 +32,12 @@ var moviesCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
+		// validate provider supports search type
+		if supported := provider.SupportsMoviesSearchType(flagSearchType); !supported {
+			log.WithField("search_type", flagSearchType).Fatalf("Unsupported search type, valid types: %s",
+				strings.Join(provider.GetMoviesSearchTypes(), ", "))
+		}
+
 		// init pvr object
 		if err := pvr.Init(pvrObj.MOVIE); err != nil {
 			log.WithError(err).Fatalf("Failed initializing pvr object for: %s", pvrName)
@@ -43,7 +50,7 @@ var moviesCmd = &cobra.Command{
 		}
 
 		// retrieve media
-		foundMediaItems, err := provider.GetShows()
+		foundMediaItems, err := provider.GetMovies()
 		if err != nil {
 			log.WithError(err).Fatal("Failed retrieving media from provider")
 		}
@@ -79,5 +86,10 @@ var moviesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(moviesCmd)
 
+	// required flags
+	moviesCmd.Flags().StringVarP(&flagSearchType, "search-type", "t", "", "Search type.")
+	_ = moviesCmd.MarkFlagRequired("search-type")
+
+	// optional flags
 	moviesCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
 }

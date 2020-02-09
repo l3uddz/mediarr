@@ -5,6 +5,7 @@ import (
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
+	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -20,6 +21,9 @@ type Tmdb struct {
 	apiKey string
 
 	genres map[int]string
+
+	supportedShowsSearchTypes  []string
+	supportedMoviesSearchTypes []string
 }
 
 type TmdbGenre struct {
@@ -40,6 +44,11 @@ func NewTmdb() *Tmdb {
 		apiUrl: "https://api.themoviedb.org/3",
 		apiKey: "",
 		genres: make(map[int]string, 0),
+
+		supportedShowsSearchTypes: []string{},
+		supportedMoviesSearchTypes: []string{
+			SEARCH_TYPE_NOW,
+		},
 	}
 }
 
@@ -108,6 +117,26 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	return nil
 }
 
+func (p *Tmdb) GetShowsSearchTypes() []string {
+	return p.supportedShowsSearchTypes
+}
+
+func (p *Tmdb) SupportsShowsSearchType(searchType string) bool {
+	return lists.StringListContains(p.supportedShowsSearchTypes, searchType, false)
+}
+
+func (p *Tmdb) GetMoviesSearchTypes() []string {
+	return p.supportedMoviesSearchTypes
+}
+
+func (p *Tmdb) SupportsMoviesSearchType(searchType string) bool {
+	return lists.StringListContains(p.supportedMoviesSearchTypes, searchType, false)
+}
+
 func (p *Tmdb) GetShows() (map[string]config.MediaItem, error) {
+	return nil, errors.New("unsupported media type")
+}
+
+func (p *Tmdb) GetMovies() (map[string]config.MediaItem, error) {
 	return nil, errors.New("unsupported media type")
 }
