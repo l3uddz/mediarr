@@ -153,7 +153,7 @@ func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
 		&providerDefaultRetry, p.rl)
 	if err != nil {
-		return nil, errors.New("failed retrieving full schedule api response")
+		return nil, errors.WithMessage(err,"failed retrieving full schedule api response")
 	}
 	defer resp.Response().Body.Close()
 
@@ -218,6 +218,6 @@ func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 	return mediaItems, nil
 }
 
-func (p *TvMaze) GetMovies() (map[string]config.MediaItem, error) {
+func (p *TvMaze) GetMovies(searchType string, params map[string]string) (map[string]config.MediaItem, error) {
 	return nil, errors.New("unsupported media type")
 }

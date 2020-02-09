@@ -11,5 +11,5 @@ type Interface interface {
 	SupportsMoviesSearchType(string) bool
 
 	GetShows() (map[string]config.MediaItem, error)
-	GetMovies() (map[string]config.MediaItem, error)
+	GetMovies(string, map[string]string) (map[string]config.MediaItem, error)
 }

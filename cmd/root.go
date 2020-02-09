@@ -29,6 +29,8 @@ var (
 
 	flagSearchType string
 
+	flagCountry string
+
 	// Global vars
 	log             *logrus.Entry
 	continueRunning *atomic.Bool
