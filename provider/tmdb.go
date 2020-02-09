@@ -27,6 +27,10 @@ type TmdbGenre struct {
 	Name string
 }
 
+type TmdbGenreResponse struct {
+	Genres []TmdbGenre
+}
+
 /* Initializer */
 
 func NewTmdb() *Tmdb {
@@ -61,13 +65,13 @@ func (p *Tmdb) loadGenres() error {
 	}
 
 	// decode response
-	var s []TmdbGenre
+	var s TmdbGenreResponse
 	if err := resp.ToJSON(&s); err != nil {
 		return errors.WithMessage(err, "failed decoding genres api response")
 	}
 
 	// parse response
-	for _, genre := range s {
+	for _, genre := range s.Genres {
 		p.genres[genre.Id] = genre.Name
 	}
 
@@ -92,6 +96,8 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	// validate api key set
 	if p.cfg == nil || p.cfg.ApiKey == "" {
 		return errors.New("provider requires an api_key to be configured")
+	} else {
+		p.apiKey = p.cfg.ApiKey
 	}
 
 	// load genres
