@@ -1,6 +1,7 @@
 package web
 
 import (
+	"go.uber.org/ratelimit"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -64,10 +65,16 @@ func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interfa
 	inputs := make([]interface{}, 0)
 	inputs = append(inputs, client)
 
-	// Extract Retry struct, append everything else
+	// Extract Retry struct and ratelimiter, append everything else
+	var rl ratelimit.Limiter = nil
 	var retry Retry
+
 	for _, vv := range v {
 		switch vT := vv.(type) {
+		case *ratelimit.Limiter:
+			rl = *vT
+		case ratelimit.Limiter:
+			rl = vT
 		case *Retry:
 			retry = *vT
 		case Retry:
@@ -85,8 +92,16 @@ func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interfa
 	for {
 		switch method {
 		case GET:
+			if rl != nil {
+				rl.Take()
+			}
+
 			resp, err = req.Get(requestUrl, inputs...)
 		case POST:
+			if rl != nil {
+				rl.Take()
+			}
+
 			resp, err = req.Post(requestUrl, inputs...)
 		default:
 			log.Error("Request method has not been implemented")

@@ -7,6 +7,7 @@ import (
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"go.uber.org/ratelimit"
 	"strconv"
 	"time"
 )
@@ -19,6 +20,8 @@ type TvMaze struct {
 
 	apiUrl string
 	apiKey string
+
+	rl ratelimit.Limiter
 }
 
 type TvMazeScheduleItem struct {
@@ -114,13 +117,16 @@ func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	// set provider config
 	p.cfg = cfg
 
+	// set ratelimiter
+	p.rl = ratelimit.New(2)
+
 	return nil
 }
 
 func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
-		&providerDefaultRetry)
+		&providerDefaultRetry, &p.rl)
 	if err != nil {
 		return nil, errors.New("failed retrieving full schedule api response")
 	}
