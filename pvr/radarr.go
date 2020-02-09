@@ -205,7 +205,7 @@ func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 
 func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movies"), 60, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie"), 60, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving movies api response")
