@@ -10,4 +10,6 @@ const (
 const (
 	SearchTypeSchedule string = "schedule"
 	SearchTypeNow      string = "now_playing"
+	SearchTypeUpcoming string = "upcoming"
+	SearchTypePopular  string = "popular"
 )

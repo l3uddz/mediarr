@@ -78,6 +78,8 @@ func NewTmdb() *Tmdb {
 		supportedShowsSearchTypes: []string{},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeNow,
+			SearchTypeUpcoming,
+			SearchTypePopular,
 		},
 	}
 }
@@ -138,7 +140,11 @@ func (p *Tmdb) GetMovies(searchType string, params map[string]string) (map[strin
 
 	switch searchType {
 	case SearchTypeNow:
-		return p.getMoviesNowPlaying(params)
+		return p.getMovies("/movie/now_playing", params)
+	case SearchTypeUpcoming:
+		return p.getMovies("/movie/upcoming", params)
+	case SearchTypePopular:
+		return p.getMovies("/movie/popular", params)
 	default:
 		break
 	}
@@ -208,7 +214,7 @@ func (p *Tmdb) loadGenres() error {
 	return nil
 }
 
-func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.MediaItem, error) {
+func (p *Tmdb) getMovies(endpoint string, params map[string]string) (map[string]config.MediaItem, error) {
 	// set request params
 	reqParams := p.getRequestParams(params)
 
@@ -224,23 +230,23 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 		reqParams["page"] = page
 
 		// send request
-		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/now_playing"),
-			providerDefaultTimeout, reqParams, &providerDefaultRetry, p.rl)
+		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, reqParams,
+			&providerDefaultRetry, p.rl)
 		if err != nil {
-			return nil, errors.WithMessage(err, "failed retrieving now_playing movies api response")
+			return nil, errors.WithMessage(err, "failed retrieving movies api response")
 		}
 
 		// validate response
 		if resp.Response().StatusCode != 200 {
 			_ = resp.Response().Body.Close()
-			return nil, fmt.Errorf("failed retrieving valid now_playing movies api response: %s", resp.Response().Status)
+			return nil, fmt.Errorf("failed retrieving valid movies api response: %s", resp.Response().Status)
 		}
 
 		// decode response
 		var s TmdbMoviesNowPlaying
 		if err := resp.ToJSON(&s); err != nil {
 			_ = resp.Response().Body.Close()
-			return nil, errors.WithMessage(err, "failed decoding now_playing movies api response")
+			return nil, errors.WithMessage(err, "failed decoding movies api response")
 		}
 
 		_ = resp.Response().Body.Close()
@@ -293,7 +299,10 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 
 		}
 
-		p.log.WithField("page", page).Debug("Retrieved")
+		p.log.WithFields(logrus.Fields{
+			"page":  page,
+			"pages": s.TotalPages,
+		}).Debug("Retrieved")
 
 		// loop logic
 		if s.Page >= s.TotalPages {
