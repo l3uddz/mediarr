@@ -15,3 +15,15 @@ type MediaItem struct {
 	Genres    []string
 	Languages []string
 }
+
+type ExprEnv struct {
+	MediaItem
+	Now func() time.Time
+}
+
+func GetExprEnv(media *MediaItem) *ExprEnv {
+	return &ExprEnv{
+		MediaItem: *media,
+		Now:       func() time.Time { return time.Now().UTC() },
+	}
+}

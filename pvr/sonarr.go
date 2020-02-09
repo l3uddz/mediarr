@@ -92,7 +92,7 @@ func (p *Sonarr) getSystemStatus() (*SonarrSystemStatus, error) {
 }
 
 func (p *Sonarr) compileExpressions() error {
-	exprEnv := &config.MediaItem{}
+	exprEnv := &config.ExprEnv{}
 
 	// compile ignores
 	for _, ignoreExpr := range p.cfg.Filters.Ignores {
@@ -153,8 +153,10 @@ func (p *Sonarr) Init(mediaType MediaType) error {
 }
 
 func (p *Sonarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
+	exprItem := config.GetExprEnv(mediaItem)
+
 	for _, expression := range p.ignoresExpr {
-		result, err := expr.Run(expression, mediaItem)
+		result, err := expr.Run(expression, exprItem)
 		if err != nil {
 			return true, errors.Wrap(err, "failed checking ignore expression")
 		}

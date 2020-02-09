@@ -93,7 +93,7 @@ func (p *Radarr) getSystemStatus() (*RadarrSystemStatus, error) {
 }
 
 func (p *Radarr) compileExpressions() error {
-	exprEnv := &config.MediaItem{}
+	exprEnv := &config.ExprEnv{}
 
 	// compile ignores
 	for _, ignoreExpr := range p.cfg.Filters.Ignores {
@@ -154,8 +154,10 @@ func (p *Radarr) Init(mediaType MediaType) error {
 }
 
 func (p *Radarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
+	exprItem := config.GetExprEnv(mediaItem)
+
 	for _, expression := range p.ignoresExpr {
-		result, err := expr.Run(expression, mediaItem)
+		result, err := expr.Run(expression, exprItem)
 		if err != nil {
 			return true, errors.Wrap(err, "failed checking ignore expression")
 		}
