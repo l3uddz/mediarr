@@ -27,6 +27,8 @@ func Get(providerType string) (Interface, error) {
 	switch strings.ToLower(providerType) {
 	case "tvmaze":
 		return NewTvMaze(), nil
+	case "tmdb":
+		return NewTmdb(), nil
 	default:
 		break
 	}
