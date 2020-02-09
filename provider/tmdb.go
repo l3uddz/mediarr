@@ -91,7 +91,7 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 
 	// validate api key set
 	if p.cfg == nil || p.cfg.ApiKey == "" {
-		return errors.New("provider requires an apikey to be configured")
+		return errors.New("provider requires an api_key to be configured")
 	}
 
 	// load genres
