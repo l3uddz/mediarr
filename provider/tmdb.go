@@ -191,9 +191,16 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 	}
 
 	for k, v := range params {
+		// skip empty params
+		if v == "" {
+			continue
+		}
+
 		switch k {
 		case "country":
 			reqParams["region"] = v
+		case "language":
+			reqParams["language"] = v
 		}
 	}
 
@@ -233,7 +240,7 @@ func (p *Tmdb) getMoviesNowPlaying(params map[string]string) (map[string]config.
 		// process response
 		for _, item := range s.Results {
 			// skip this item?
-			if item.Adult {
+			if item.Adult || item.Video {
 				continue
 			}
 

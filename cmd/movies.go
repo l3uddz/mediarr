@@ -51,7 +51,8 @@ var moviesCmd = &cobra.Command{
 
 		// build param map
 		params := map[string]string{
-			"country": flagCountry,
+			"country":  flagCountry,
+			"language": flagLanguage,
 		}
 
 		// retrieve media
@@ -98,6 +99,7 @@ func init() {
 	// optional flags
 	moviesCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
 
-	moviesCmd.Flags().StringVar(&flagCountry, "country", "us", "Country to filter results.")
+	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
+	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")
 
 }

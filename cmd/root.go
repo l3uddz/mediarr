@@ -29,7 +29,8 @@ var (
 
 	flagSearchType string
 
-	flagCountry string
+	flagCountry  string
+	flagLanguage string
 
 	// Global vars
 	log             *logrus.Entry

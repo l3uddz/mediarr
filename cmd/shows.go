@@ -92,4 +92,7 @@ func init() {
 
 	// optional flags
 	showsCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
+
+	showsCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
+	showsCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")
 }
