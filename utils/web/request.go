@@ -65,7 +65,7 @@ func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interfa
 	inputs := make([]interface{}, 0)
 	inputs = append(inputs, client)
 
-	// Extract Retry struct and ratelimiter, append everything else
+	// Extract Retry struct and/or ratelimit object, append everything else
 	var rl ratelimit.Limiter = nil
 	var retry Retry
 
