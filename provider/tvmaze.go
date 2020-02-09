@@ -21,7 +21,7 @@ type TvMaze struct {
 	apiUrl string
 	apiKey string
 
-	rl ratelimit.Limiter
+	rl *ratelimit.Limiter
 }
 
 type TvMazeScheduleItem struct {
@@ -118,7 +118,7 @@ func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	p.cfg = cfg
 
 	// set ratelimiter
-	p.rl = ratelimit.New(2)
+	p.rl = web.GetRateLimiter("tvmaze", 2)
 
 	return nil
 }
@@ -126,7 +126,7 @@ func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 func (p *TvMaze) GetShows() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
-		&providerDefaultRetry, &p.rl)
+		&providerDefaultRetry, p.rl)
 	if err != nil {
 		return nil, errors.New("failed retrieving full schedule api response")
 	}
