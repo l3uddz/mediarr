@@ -15,6 +15,7 @@ import (
 
 type TvMaze struct {
 	log *logrus.Entry
+	cfg *config.Provider
 
 	apiUrl string
 	apiKey string
@@ -93,6 +94,7 @@ type TvMazeScheduleItem struct {
 func NewTvMaze() *TvMaze {
 	return &TvMaze{
 		log:    logger.GetLogger("tvmaze"),
+		cfg:    nil,
 		apiUrl: "http://api.tvmaze.com",
 		apiKey: "",
 	}
@@ -100,7 +102,7 @@ func NewTvMaze() *TvMaze {
 
 /* Interface Implements */
 
-func (p *TvMaze) Init(mediaType MediaType) error {
+func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	// validate we support this media type
 	switch mediaType {
 	case SHOW:
@@ -108,6 +110,9 @@ func (p *TvMaze) Init(mediaType MediaType) error {
 	default:
 		return errors.New("unsupported media type")
 	}
+
+	// set provider config
+	p.cfg = cfg
 
 	return nil
 }

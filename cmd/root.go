@@ -38,6 +38,7 @@ var (
 
 	providerName      string
 	lowerProviderName string
+	providerCfg       *config.Provider
 	provider          providerObj.Interface
 )
 
@@ -123,6 +124,14 @@ func parseValidateInputs(args []string) error {
 	// set provider
 	providerName = args[1]
 	lowerProviderName = strings.ToLower(providerName)
+
+	for pName, pCfg := range config.Config.Provider {
+		if strings.EqualFold(pName, providerName) {
+			providerCfg = pCfg
+			break
+		}
+	}
+
 	provider, err = providerObj.Get(lowerProviderName)
 	if err != nil {
 		return errors.WithMessage(err, "failed loading provider object")

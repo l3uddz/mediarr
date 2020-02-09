@@ -13,7 +13,8 @@ import (
 )
 
 type Configuration struct {
-	Pvr map[string]*Pvr
+	Pvr      map[string]*Pvr
+	Provider map[string]*Provider
 }
 
 /* Vars */

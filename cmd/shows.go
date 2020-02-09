@@ -27,7 +27,7 @@ var showsCmd = &cobra.Command{
 		defer database.Close()
 
 		// init provider object
-		if err := provider.Init(providerObj.SHOW); err != nil {
+		if err := provider.Init(providerObj.SHOW, providerCfg); err != nil {
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
