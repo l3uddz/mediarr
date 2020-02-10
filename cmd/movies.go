@@ -63,6 +63,7 @@ var moviesCmd = &cobra.Command{
 			"language": flagLanguage,
 			"genre":    flagGenre,
 			"year":     flagYear,
+			"rating":   flagRating,
 		}
 
 		// retrieve media
@@ -94,5 +95,6 @@ func init() {
 	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
 	moviesCmd.Flags().StringVar(&flagGenre, "genre", "", "Genres to filter results.")
 	moviesCmd.Flags().StringVar(&flagYear, "year", "", "Years to filter results.")
+	moviesCmd.Flags().StringVar(&flagRating, "rating", "", "Ratings to filter results.")
 
 }

@@ -187,6 +187,8 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 			reqParams["genres"] = v
 		case "year":
 			reqParams["years"] = v
+		case "rating":
+			reqParams["ratings"] = v
 		default:
 			break
 		}
@@ -315,6 +317,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				ImdbId:    movieItem.Ids.Imdb,
 				Slug:      movieItem.Ids.Slug,
 				Title:     movieItem.Title,
+				Country:   movieItem.Country,
 				Network:   "",
 				Date:      date,
 				Year:      date.Year(),

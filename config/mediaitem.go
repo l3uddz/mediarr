@@ -9,6 +9,7 @@ type MediaItem struct {
 	ImdbId    string
 	Slug      string
 	Title     string
+	Country   string
 	Network   string
 	Date      time.Time
 	Year      int
