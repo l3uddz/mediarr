@@ -24,7 +24,8 @@ type Tmdb struct {
 	apiUrl string
 	apiKey string
 
-	rl *ratelimit.Limiter
+	reqRatelimit *ratelimit.Limiter
+	reqRetry     web.Retry
 
 	genres map[int]string
 
@@ -147,7 +148,10 @@ func (p *Tmdb) Init(mediaType MediaType, cfg map[string]string) error {
 	}
 
 	// set ratelimiter
-	p.rl = web.GetRateLimiter("tmdb", 3)
+	p.reqRatelimit = web.GetRateLimiter("tmdb", 3)
+
+	// set default retry
+	p.reqRetry = providerDefaultRetry
 
 	// load genres
 	if err := p.loadGenres(); err != nil {
@@ -233,7 +237,7 @@ func (p *Tmdb) loadGenres() error {
 
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), providerDefaultTimeout,
-		params, &providerDefaultTimeout, p.rl)
+		params, &providerDefaultTimeout, p.reqRatelimit)
 	if err != nil {
 		return errors.WithMessage(err, "failed retrieving genres api response")
 	}
@@ -267,7 +271,7 @@ func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error)
 
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), providerDefaultTimeout,
-		params, &providerDefaultTimeout, p.rl)
+		params, &providerDefaultTimeout, p.reqRatelimit)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
 	}
@@ -314,7 +318,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 
 		// send request
 		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, reqParams,
-			&providerDefaultRetry, p.rl)
+			&p.reqRetry, p.reqRatelimit)
 		if err != nil {
 			return nil, errors.WithMessage(err, "failed retrieving movies api response")
 		}
