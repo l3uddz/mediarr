@@ -43,6 +43,25 @@ type RadarrMovies struct {
 	TmdbId int
 }
 
+type RadarrAddMovieRequest struct {
+	Title               string                `json:"title"`
+	TitleSlug           string                `json:"titleSlug"`
+	Year                int                   `json:"year"`
+	QualityProfileId    int                   `json:"qualityProfileId"`
+	Images              []string              `json:"images"`
+	Monitored           bool                  `json:"monitored"`
+	RootFolderPath      string                `json:"rootFolderPath"`
+	MinimumAvailability string                `json:"minimumAvailability"`
+	AddOptions          RadarrAddMovieOptions `json:"addOptions"`
+	TmdbId              int                   `json:"tmdbId"`
+}
+
+type RadarrAddMovieOptions struct {
+	SearchForMovie             bool `json:"searchForMovie"`
+	IgnoreEpisodesWithFiles    bool `json:"ignoreEpisodesWithFiles"`
+	IgnoreEpisodesWithoutFiles bool `json:"ignoreEpisodesWithoutFiles"`
+}
+
 /* Initializer */
 
 func NewRadarr(name string, c *config.Pvr) *Radarr {
@@ -203,6 +222,47 @@ func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	}
 
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
+}
+
+func (p *Radarr) AddMedia(item *config.MediaItem) error {
+	// convert TmdbId to int
+	tmdbId, err := strconv.Atoi(item.TmdbId)
+	if err != nil {
+		return fmt.Errorf("failed converting tmdb id to int: %q", item.TmdbId)
+	}
+
+	// set request params
+	params := RadarrAddMovieRequest{
+		Title:               item.Title,
+		TitleSlug:           item.Slug,
+		Year:                item.Year,
+		QualityProfileId:    p.qualityProfileId,
+		Images:              []string{},
+		Monitored:           true,
+		RootFolderPath:      p.cfg.RootFolder,
+		MinimumAvailability: "released",
+		AddOptions: RadarrAddMovieOptions{
+			SearchForMovie:             true,
+			IgnoreEpisodesWithFiles:    false,
+			IgnoreEpisodesWithoutFiles: false,
+		},
+		TmdbId: tmdbId,
+	}
+
+	// send request
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/movie"), 60, p.reqHeaders,
+		req.BodyJSON(params))
+	if err != nil {
+		return errors.New("failed retrieving add movies api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 && resp.Response().StatusCode != 201 {
+		return fmt.Errorf("failed retrieving valid add movies api response: %s", resp.Response().Status)
+	}
+
+	return nil
 }
 
 func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {

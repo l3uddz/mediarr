@@ -74,7 +74,12 @@ var moviesCmd = &cobra.Command{
 
 		// iterate accepted items
 		for _, mediaItem := range foundMediaItems {
-			log.Infof("Adding: %s", mediaItem.String())
+			log.Debugf("Adding: %s", mediaItem.String())
+			if err := pvr.AddMedia(&mediaItem); err != nil {
+				log.WithError(err).Errorf("Failed adding: %s", mediaItem.String())
+			} else {
+				log.Infof("Added: %s", mediaItem.String())
+			}
 		}
 	},
 }

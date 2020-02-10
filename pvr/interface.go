@@ -10,4 +10,5 @@ type Interface interface {
 
 	GetQualityProfileId(string) (int, error)
 	GetExistingMedia() (map[string]config.MediaItem, error)
+	AddMedia(*config.MediaItem) error
 }

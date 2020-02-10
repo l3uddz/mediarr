@@ -204,6 +204,10 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
 }
 
+func (p *Sonarr) AddMedia(item *config.MediaItem) error {
+	return nil
+}
+
 func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,

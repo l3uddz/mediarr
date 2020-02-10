@@ -378,7 +378,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			// skip this item?
 			if movieItem.Ids.Slug == "" {
 				continue
-			} else if movieItem.Ids.Tmdb == 0 && movieItem.Ids.Imdb == "" {
+			} else if movieItem.Ids.Tmdb == 0 {
 				continue
 			} else if movieItem.Runtime == 0 {
 				continue
