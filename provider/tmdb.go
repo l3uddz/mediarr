@@ -139,7 +139,7 @@ func (p *Tmdb) Init(mediaType MediaType, cfg map[string]string) error {
 
 	// validate api key set
 	if p.cfg == nil {
-		return errors.New("provider requires an api_key to be configured")
+		return errors.New("provider has no configuration data set")
 	} else if v, err := config.GetProviderSetting(cfg, "api_key"); err != nil {
 		return errors.New("provider requires an api_key to be configured")
 	} else {
