@@ -18,7 +18,7 @@ import (
 
 type Tmdb struct {
 	log               *logrus.Entry
-	cfg               *config.Provider
+	cfg               map[string]string
 	fnAcceptMediaItem func(*config.MediaItem) bool
 
 	apiUrl string
@@ -125,7 +125,7 @@ func NewTmdb() *Tmdb {
 
 /* Interface Implements */
 
-func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
+func (p *Tmdb) Init(mediaType MediaType, cfg map[string]string) error {
 	// validate we support this media type
 	switch mediaType {
 	case Movie:
@@ -138,10 +138,12 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	p.cfg = cfg
 
 	// validate api key set
-	if p.cfg == nil || p.cfg.ApiKey == "" {
+	if p.cfg == nil {
+		return errors.New("provider requires an api_key to be configured")
+	} else if v, err := config.GetProviderSetting(cfg, "api_key"); err != nil {
 		return errors.New("provider requires an api_key to be configured")
 	} else {
-		p.apiKey = p.cfg.ApiKey
+		p.apiKey = *v
 	}
 
 	// set ratelimiter

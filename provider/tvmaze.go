@@ -18,7 +18,7 @@ import (
 
 type TvMaze struct {
 	log               *logrus.Entry
-	cfg               *config.Provider
+	cfg               map[string]string
 	fnAcceptMediaItem func(*config.MediaItem) bool
 
 	apiUrl string
@@ -118,7 +118,7 @@ func NewTvMaze() *TvMaze {
 
 /* Interface Implements */
 
-func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
+func (p *TvMaze) Init(mediaType MediaType, cfg map[string]string) error {
 	// validate we support this media type
 	switch mediaType {
 	case Show:

@@ -46,7 +46,7 @@ var (
 
 	providerName      string
 	lowerProviderName string
-	providerCfg       *config.Provider
+	providerCfg       map[string]string
 	provider          providerObj.Interface
 )
 
