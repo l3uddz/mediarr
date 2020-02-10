@@ -33,34 +33,35 @@ type Trakt struct {
 	supportedMoviesSearchTypes []string
 }
 
+type TraktMovie struct {
+	Title string `json:"title"`
+	Year  int    `json:"year"`
+	Ids   struct {
+		Trakt int    `json:"trakt"`
+		Slug  string `json:"slug"`
+		Imdb  string `json:"imdb"`
+		Tmdb  int    `json:"tmdb"`
+	} `json:"ids"`
+	Tagline               string   `json:"tagline"`
+	Overview              string   `json:"overview"`
+	Released              string   `json:"released"`
+	Runtime               int      `json:"runtime"`
+	Country               string   `json:"country"`
+	Trailer               string   `json:"trailer"`
+	Homepage              string   `json:"homepage"`
+	Status                string   `json:"status"`
+	Rating                float64  `json:"rating"`
+	Votes                 int      `json:"votes"`
+	CommentCount          int      `json:"comment_count"`
+	Language              string   `json:"language"`
+	AvailableTranslations []string `json:"available_translations"`
+	Genres                []string `json:"genres"`
+	Certification         string   `json:"certification"`
+}
+
 type TraktMoviesResponse []struct {
-	Watchers int `json:"watchers"`
-	Movie    struct {
-		Title string `json:"title"`
-		Year  int    `json:"year"`
-		Ids   struct {
-			Trakt int    `json:"trakt"`
-			Slug  string `json:"slug"`
-			Imdb  string `json:"imdb"`
-			Tmdb  int    `json:"tmdb"`
-		} `json:"ids"`
-		Tagline               string    `json:"tagline"`
-		Overview              string    `json:"overview"`
-		Released              string    `json:"released"`
-		Runtime               int       `json:"runtime"`
-		Country               string    `json:"country"`
-		Trailer               string    `json:"trailer"`
-		Homepage              string    `json:"homepage"`
-		Status                string    `json:"status"`
-		Rating                float64   `json:"rating"`
-		Votes                 int       `json:"votes"`
-		CommentCount          int       `json:"comment_count"`
-		UpdatedAt             time.Time `json:"updated_at"`
-		Language              string    `json:"language"`
-		AvailableTranslations []string  `json:"available_translations"`
-		Genres                []string  `json:"genres"`
-		Certification         string    `json:"certification"`
-	} `json:"movie"`
+	Watchers int        `json:"watchers"`
+	Movie    TraktMovie `json:"movie"`
 }
 
 /* Initializer */
@@ -228,21 +229,28 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 
 		// process response
 		for _, item := range s {
+			// set movie item
+			var movieItem TraktMovie = item.Movie
+
 			// skip this item?
-
-			// does item already exist?
-			itemId := strconv.Itoa(item.Movie.Ids.Tmdb)
-
-			if _, exists := mediaItems[itemId]; exists {
+			if movieItem.Ids.Slug == "" {
 				continue
-			} else if _, exists := mediaItems[item.Movie.Ids.Imdb]; exists {
+			} else if movieItem.Runtime == 0 {
+				continue
+			} else if movieItem.Released == "" {
 				continue
 			}
 
-			// parse item genres
+			// does item already exist?
+			itemId := strconv.Itoa(movieItem.Ids.Tmdb)
+			if _, exists := mediaItems[itemId]; exists {
+				continue
+			} else if _, exists := mediaItems[movieItem.Ids.Imdb]; exists {
+				continue
+			}
 
 			// parse item date
-			date, err := time.Parse("2006-01-02", item.Movie.Released)
+			date, err := time.Parse("2006-01-02", movieItem.Released)
 			if err != nil {
 				p.log.WithError(err).Tracef("Failed parsing release date for item: %+v", item)
 				continue
@@ -253,14 +261,14 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Provider:  "trakt",
 				TvdbId:    "",
 				TmdbId:    itemId,
-				ImdbId:    item.Movie.Ids.Imdb,
-				Title:     item.Movie.Title,
+				ImdbId:    movieItem.Ids.Imdb,
+				Title:     movieItem.Title,
 				Network:   "",
 				Date:      date,
 				Year:      date.Year(),
-				Runtime:   item.Movie.Runtime,
-				Genres:    item.Movie.Genres,
-				Languages: []string{item.Movie.Language},
+				Runtime:   movieItem.Runtime,
+				Genres:    movieItem.Genres,
+				Languages: []string{movieItem.Language},
 			}
 
 			// media item wanted?
