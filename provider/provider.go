@@ -29,6 +29,8 @@ func Get(providerType string) (Interface, error) {
 		return NewTvMaze(), nil
 	case "tmdb":
 		return NewTmdb(), nil
+	case "trakt":
+		return NewTrakt(), nil
 	default:
 		break
 	}
