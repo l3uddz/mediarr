@@ -66,6 +66,41 @@ type TraktMoviesResponse struct {
 	Movie *TraktMovie `json:"movie"`
 }
 
+type TraktShowIds struct {
+	Trakt int    `json:"trakt"`
+	Slug  string `json:"slug"`
+	Tvdb  int    `json:"tvdb"`
+	Imdb  string `json:"imdb"`
+	Tmdb  int    `json:"tmdb"`
+}
+
+type TraktShow struct {
+	Title                 string       `json:"title"`
+	Year                  int          `json:"year"`
+	Ids                   TraktShowIds `json:"ids"`
+	Overview              string       `json:"overview"`
+	FirstAired            time.Time    `json:"first_aired"`
+	Runtime               int          `json:"runtime"`
+	Certification         string       `json:"certification"`
+	Network               string       `json:"network"`
+	Country               string       `json:"country"`
+	Trailer               string       `json:"trailer"`
+	Homepage              string       `json:"homepage"`
+	Status                string       `json:"status"`
+	Rating                float64      `json:"rating"`
+	Votes                 int          `json:"votes"`
+	CommentCount          int          `json:"comment_count"`
+	Language              string       `json:"language"`
+	AvailableTranslations []string     `json:"available_translations"`
+	Genres                []string     `json:"genres"`
+	AiredEpisodes         int          `json:"aired_episodes"`
+}
+
+type TraktShowsResponse struct {
+	TraktShow
+	Show *TraktShow `json:"show"`
+}
+
 /* Initializer */
 
 func NewTrakt() *Trakt {
@@ -79,7 +114,9 @@ func NewTrakt() *Trakt {
 
 		genres: make(map[int]string, 0),
 
-		supportedShowsSearchTypes: []string{},
+		supportedShowsSearchTypes: []string{
+			SearchTypePopular,
+		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
 			SearchTypeUpcoming,
@@ -94,7 +131,7 @@ func NewTrakt() *Trakt {
 func (p *Trakt) Init(mediaType MediaType, cfg map[string]string) error {
 	// validate we support this media type
 	switch mediaType {
-	case Movie:
+	case Movie, Show:
 		break
 	default:
 		return errors.New("unsupported media type")
@@ -142,7 +179,15 @@ func (p *Trakt) SupportsMoviesSearchType(searchType string) bool {
 }
 
 func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
-	return nil, errors.New("unsupported media type")
+
+	switch searchType {
+	case SearchTypePopular:
+		return p.getShows("/shows/popular", logic, params)
+	default:
+		break
+	}
+
+	return nil, fmt.Errorf("unsupported search_type: %q", searchType)
 }
 
 func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
@@ -197,7 +242,7 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 	return reqParams
 }
 
-func (p *Trakt) translateTraktMovie(response TraktMoviesResponse) *TraktMovie {
+func (p *Trakt) translateMovie(response TraktMoviesResponse) *TraktMovie {
 	if response.Movie != nil {
 		return response.Movie
 	}
@@ -226,6 +271,40 @@ func (p *Trakt) translateTraktMovie(response TraktMoviesResponse) *TraktMovie {
 		AvailableTranslations: response.AvailableTranslations,
 		Genres:                response.Genres,
 		Certification:         response.Certification,
+	}
+}
+
+func (p *Trakt) translateShow(response TraktShowsResponse) *TraktShow {
+	if response.Show != nil {
+		return response.Show
+	}
+
+	return &TraktShow{
+		Title: response.Title,
+		Year:  response.Year,
+		Ids: TraktShowIds{
+			Trakt: response.Ids.Trakt,
+			Slug:  response.Ids.Slug,
+			Tvdb:  response.Ids.Tvdb,
+			Imdb:  response.Ids.Imdb,
+			Tmdb:  response.Ids.Tmdb,
+		},
+		Overview:              response.Overview,
+		FirstAired:            response.FirstAired,
+		Runtime:               response.Runtime,
+		Certification:         response.Certification,
+		Network:               response.Network,
+		Country:               response.Country,
+		Trailer:               response.Trailer,
+		Homepage:              response.Homepage,
+		Status:                response.Status,
+		Rating:                response.Rating,
+		Votes:                 response.Votes,
+		CommentCount:          response.CommentCount,
+		Language:              response.Language,
+		AvailableTranslations: response.AvailableTranslations,
+		Genres:                response.Genres,
+		AiredEpisodes:         response.AiredEpisodes,
 	}
 }
 
@@ -279,7 +358,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		// process response
 		for _, item := range s {
 			// set movie item
-			var movieItem *TraktMovie = p.translateTraktMovie(item)
+			var movieItem *TraktMovie = p.translateMovie(item)
 			if movieItem == nil {
 				p.log.Tracef("Failed translating trakt movie: %#v", item)
 				continue
@@ -324,6 +403,148 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Runtime:   movieItem.Runtime,
 				Genres:    movieItem.Genres,
 				Languages: []string{movieItem.Language},
+			}
+
+			// media item wanted?
+			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
+				p.log.Tracef("Ignoring: %+v", mediaItem)
+				ignoredItemsSize += 1
+				continue
+			} else {
+				p.log.Debugf("Accepted: %+v", mediaItem)
+			}
+
+			// set media item
+			mediaItems[itemId] = mediaItem
+			mediaItemsSize += 1
+
+			// stop when limit reached
+			if limit > 0 && mediaItemsSize >= limit {
+				// limit was supplied via cli and we have reached this limit
+				limitReached = true
+				break
+			}
+		}
+
+		// parse pages information
+		totalPages := 0
+		tmp := resp.Response().Header.Get("X-Pagination-Page-Count")
+		if v, err := strconv.Atoi(tmp); err == nil {
+			totalPages = v
+		}
+
+		p.log.WithFields(logrus.Fields{
+			"page":     page,
+			"pages":    totalPages,
+			"accepted": mediaItemsSize,
+			"ignored":  ignoredItemsSize,
+		}).Info("Retrieved")
+
+		// loop logic
+		if limitReached {
+			// the limit has been reached for accepted items
+			break
+		}
+
+		if page >= totalPages {
+			break
+		} else {
+			page += 1
+		}
+	}
+
+	p.log.WithField("accepted_items", mediaItemsSize).Info("Retrieved media items")
+	return mediaItems, nil
+}
+
+func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
+	// set request params
+	reqParams := p.getRequestParams(params)
+
+	p.log.Tracef("Request params: %+v", params)
+
+	// parse logic params
+	limit := 0
+	limitReached := false
+
+	if v := getLogicParam(logic, "limit"); v != nil {
+		limit = v.(int)
+	}
+
+	// fetch all page results
+	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItemsSize := 0
+	ignoredItemsSize := 0
+
+	page := 1
+
+	for {
+		// set params
+		reqParams["page"] = page
+
+		// send request
+		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, p.apiHeaders,
+			reqParams, &p.reqRetry, p.reqRatelimit)
+		if err != nil {
+			return nil, errors.WithMessage(err, "failed retrieving shows api response")
+		}
+
+		// validate response
+		if resp.Response().StatusCode != 200 {
+			_ = resp.Response().Body.Close()
+			return nil, fmt.Errorf("failed retrieving valid shows api response: %s", resp.Response().Status)
+		}
+
+		// decode response
+		var s []TraktShowsResponse
+		if err := resp.ToJSON(&s); err != nil {
+			_ = resp.Response().Body.Close()
+			return nil, errors.WithMessage(err, "failed decoding shows api response")
+		}
+
+		_ = resp.Response().Body.Close()
+
+		// process response
+		for _, item := range s {
+			// set movie item
+			var showItem *TraktShow = p.translateShow(item)
+			if showItem == nil {
+				p.log.Tracef("Failed translating trakt show: %#v", item)
+				continue
+			}
+
+			// skip this item?
+			if showItem.Ids.Slug == "" {
+				continue
+			} else if showItem.Runtime == 0 {
+				continue
+			} else if showItem.FirstAired.IsZero() {
+				continue
+			}
+
+			// does item already exist?
+			itemId := strconv.Itoa(showItem.Ids.Tvdb)
+			if _, exists := mediaItems[itemId]; exists {
+				continue
+			} else if _, exists := mediaItems[showItem.Ids.Imdb]; exists {
+				continue
+			}
+
+			// init media item
+			mediaItem := config.MediaItem{
+				Provider:  "trakt",
+				TvdbId:    itemId,
+				TmdbId:    strconv.Itoa(showItem.Ids.Tmdb),
+				ImdbId:    showItem.Ids.Imdb,
+				Slug:      showItem.Ids.Slug,
+				Title:     showItem.Title,
+				Country:   showItem.Country,
+				Network:   showItem.Network,
+				Date:      showItem.FirstAired,
+				Year:      showItem.FirstAired.Year(),
+				Runtime:   showItem.Runtime,
+				Genres:    showItem.Genres,
+				Languages: []string{showItem.Language},
 			}
 
 			// media item wanted?
