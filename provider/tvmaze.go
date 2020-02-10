@@ -251,7 +251,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 			ignoredItemsSize += 1
 			continue
 		} else if !media.ValidateTvdbId(itemId) {
-			p.log.Tracef("Bad TvdbId, ignoring: %+v", mediaItem)
+			p.log.Tracef("Ignoring, bad TvdbId: %+v", mediaItem)
 			ignoredItemsSize += 1
 			continue
 		} else {
