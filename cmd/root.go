@@ -32,6 +32,8 @@ var (
 
 	flagCountry  string
 	flagLanguage string
+	flagGenre    string
+	flagYear     string
 
 	// Global vars
 	log             *logrus.Entry

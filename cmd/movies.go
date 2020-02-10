@@ -61,6 +61,8 @@ var moviesCmd = &cobra.Command{
 		params := map[string]string{
 			"country":  flagCountry,
 			"language": flagLanguage,
+			"genre":    flagGenre,
+			"year":     flagYear,
 		}
 
 		// retrieve media
@@ -88,7 +90,9 @@ func init() {
 
 	moviesCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
-	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
-	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")
+	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Countries to filter results.")
+	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
+	moviesCmd.Flags().StringVar(&flagGenre, "genre", "", "Genres to filter results.")
+	moviesCmd.Flags().StringVar(&flagYear, "year", "", "Years to filter results.")
 
 }

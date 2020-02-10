@@ -84,6 +84,7 @@ func NewTrakt() *Trakt {
 			SearchTypeTrending,
 			SearchTypeUpcoming,
 			SearchTypePopular,
+			SearchTypeNow,
 		},
 	}
 }
@@ -153,6 +154,8 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		return p.getMovies("/movies/anticipated", logic, params)
 	case SearchTypeTrending:
 		return p.getMovies("/movies/trending", logic, params)
+	case SearchTypeNow:
+		return p.getMovies("/movies/boxoffice", logic, params)
 	default:
 		break
 	}
@@ -180,7 +183,10 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 			reqParams["countries"] = v
 		case "language":
 			reqParams["languages"] = v
-
+		case "genre":
+			reqParams["genres"] = v
+		case "year":
+			reqParams["years"] = v
 		default:
 			break
 		}
