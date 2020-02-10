@@ -238,6 +238,8 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 	// fetch all page results
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
+	ignoredItemsSize := 0
+
 	page := 1
 
 	for {
@@ -313,6 +315,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			// media item wanted?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Tracef("Ignoring: %+v", mediaItem)
+				ignoredItemsSize += 1
 				continue
 			} else {
 				p.log.Debugf("Accepted: %+v", mediaItem)
@@ -331,9 +334,10 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 		}
 
 		p.log.WithFields(logrus.Fields{
-			"page":           page,
-			"pages":          s.TotalPages,
-			"accepted_items": mediaItemsSize,
+			"page":     page,
+			"pages":    s.TotalPages,
+			"accepted": mediaItemsSize,
+			"ignored":  ignoredItemsSize,
 		}).Info("Retrieved")
 
 		// loop logic

@@ -203,6 +203,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 	// process response
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
+	ignoredItemsSize := 0
 
 	for _, item := range s {
 		// skip invalid items
@@ -246,6 +247,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// media item wanted?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Tracef("Ignoring: %+v", mediaItem)
+			ignoredItemsSize += 1
 			continue
 		} else {
 			p.log.Debugf("Accepted: %+v", mediaItem)
@@ -262,6 +264,9 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		}
 	}
 
-	p.log.WithField("accepted_items", mediaItemsSize).Info("Retrieved media items")
+	p.log.WithFields(logrus.Fields{
+		"accepted": mediaItemsSize,
+		"ignored":  ignoredItemsSize,
+	}).Info("Retrieved media items")
 	return mediaItems, nil
 }
