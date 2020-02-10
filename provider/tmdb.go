@@ -41,7 +41,7 @@ type TmdbGenreResponse struct {
 	Genres []TmdbGenre
 }
 
-type TmdbMoviesNowPlaying struct {
+type TmdbMoviesResponse struct {
 	Results []struct {
 		Popularity       float64 `json:"popularity"`
 		VoteCount        int     `json:"vote_count"`
@@ -64,6 +64,42 @@ type TmdbMoviesNowPlaying struct {
 		Minimum string `json:"minimum"`
 	} `json:"dates"`
 	TotalPages int `json:"total_pages"`
+}
+
+type TmdbMovieDetailsResponse struct {
+	Adult               bool        `json:"adult"`
+	BackdropPath        string      `json:"backdrop_path"`
+	BelongsToCollection interface{} `json:"belongs_to_collection"`
+	Budget              int         `json:"budget"`
+	Genres              []struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"genres"`
+	Homepage            string        `json:"homepage"`
+	ID                  int           `json:"id"`
+	ImdbID              string        `json:"imdb_id"`
+	OriginalLanguage    string        `json:"original_language"`
+	OriginalTitle       string        `json:"original_title"`
+	Overview            string        `json:"overview"`
+	Popularity          float64       `json:"popularity"`
+	PosterPath          string        `json:"poster_path"`
+	ProductionCompanies []interface{} `json:"production_companies"`
+	ProductionCountries []struct {
+		Iso31661 string `json:"iso_3166_1"`
+		Name     string `json:"name"`
+	} `json:"production_countries"`
+	ReleaseDate     string `json:"release_date"`
+	Revenue         int    `json:"revenue"`
+	Runtime         int    `json:"runtime"`
+	SpokenLanguages []struct {
+		Iso6391 string `json:"iso_639_1"`
+		Name    string `json:"name"`
+	} `json:"spoken_languages"`
+	Status    string `json:"status"`
+	Tagline   string `json:"tagline"`
+	Title     string `json:"title"`
+	Video     bool   `json:"video"`
+	VoteCount int    `json:"vote_count"`
 }
 
 /* Initializer */
@@ -221,6 +257,34 @@ func (p *Tmdb) loadGenres() error {
 	return nil
 }
 
+func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error) {
+	// set request params
+	params := req.Param{
+		"api_key": p.apiKey,
+	}
+
+	// send request
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), providerDefaultTimeout,
+		params, &providerDefaultTimeout, p.rl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 {
+		return nil, fmt.Errorf("failed retrieving valid movie details api response: %s", resp.Response().Status)
+	}
+
+	// decode response
+	var s TmdbMovieDetailsResponse
+	if err := resp.ToJSON(&s); err != nil {
+		return nil, errors.WithMessage(err, "failed decoding movie details api response")
+	}
+
+	return &s, nil
+}
+
 func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	// set request params
 	reqParams := p.getRequestParams(params)
@@ -260,7 +324,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 		}
 
 		// decode response
-		var s TmdbMoviesNowPlaying
+		var s TmdbMoviesResponse
 		if err := resp.ToJSON(&s); err != nil {
 			_ = resp.Response().Body.Close()
 			return nil, errors.WithMessage(err, "failed decoding movies api response")
