@@ -33,35 +33,37 @@ type Trakt struct {
 	supportedMoviesSearchTypes []string
 }
 
-type TraktMovie struct {
-	Title string `json:"title"`
-	Year  int    `json:"year"`
-	Ids   struct {
-		Trakt int    `json:"trakt"`
-		Slug  string `json:"slug"`
-		Imdb  string `json:"imdb"`
-		Tmdb  int    `json:"tmdb"`
-	} `json:"ids"`
-	Tagline               string   `json:"tagline"`
-	Overview              string   `json:"overview"`
-	Released              string   `json:"released"`
-	Runtime               int      `json:"runtime"`
-	Country               string   `json:"country"`
-	Trailer               string   `json:"trailer"`
-	Homepage              string   `json:"homepage"`
-	Status                string   `json:"status"`
-	Rating                float64  `json:"rating"`
-	Votes                 int      `json:"votes"`
-	CommentCount          int      `json:"comment_count"`
-	Language              string   `json:"language"`
-	AvailableTranslations []string `json:"available_translations"`
-	Genres                []string `json:"genres"`
-	Certification         string   `json:"certification"`
+type TraktMovieIds struct {
+	Trakt int    `json:"trakt"`
+	Slug  string `json:"slug"`
+	Imdb  string `json:"imdb"`
+	Tmdb  int    `json:"tmdb"`
 }
 
-type TraktMoviesResponse []struct {
-	Watchers int        `json:"watchers"`
-	Movie    TraktMovie `json:"movie"`
+type TraktMovie struct {
+	Title                 string        `json:"title"`
+	Year                  int           `json:"year"`
+	Ids                   TraktMovieIds `json:"ids"`
+	Tagline               string        `json:"tagline"`
+	Overview              string        `json:"overview"`
+	Released              string        `json:"released"`
+	Runtime               int           `json:"runtime"`
+	Country               string        `json:"country"`
+	Trailer               string        `json:"trailer"`
+	Homepage              string        `json:"homepage"`
+	Status                string        `json:"status"`
+	Rating                float64       `json:"rating"`
+	Votes                 int           `json:"votes"`
+	CommentCount          int           `json:"comment_count"`
+	Language              string        `json:"language"`
+	AvailableTranslations []string      `json:"available_translations"`
+	Genres                []string      `json:"genres"`
+	Certification         string        `json:"certification"`
+}
+
+type TraktMoviesResponse struct {
+	TraktMovie
+	Movie *TraktMovie `json:"movie"`
 }
 
 /* Initializer */
@@ -80,6 +82,8 @@ func NewTrakt() *Trakt {
 		supportedShowsSearchTypes: []string{},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
+			SearchTypeUpcoming,
+			SearchTypePopular,
 		},
 	}
 }
@@ -143,6 +147,10 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 
 	switch searchType {
+	case SearchTypePopular:
+		return p.getMovies("/movies/popular", logic, params)
+	case SearchTypeUpcoming:
+		return p.getMovies("/movies/anticipated", logic, params)
 	case SearchTypeTrending:
 		return p.getMovies("/movies/trending", logic, params)
 	default:
@@ -158,6 +166,7 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 	// set request params
 	reqParams := req.Param{
 		"extended": "full",
+		"limit":    100,
 	}
 
 	for k, v := range params {
@@ -168,9 +177,9 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 
 		switch k {
 		case "country":
-			reqParams["region"] = v
+			reqParams["countries"] = v
 		case "language":
-			reqParams["language"] = v
+			reqParams["languages"] = v
 
 		default:
 			break
@@ -178,6 +187,38 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 	}
 
 	return reqParams
+}
+
+func (p *Trakt) translateTraktMovie(response TraktMoviesResponse) *TraktMovie {
+	if response.Movie != nil {
+		return response.Movie
+	}
+
+	return &TraktMovie{
+		Title: response.Title,
+		Year:  response.Year,
+		Ids: TraktMovieIds{
+			Trakt: response.Ids.Trakt,
+			Slug:  response.Ids.Slug,
+			Imdb:  response.Ids.Imdb,
+			Tmdb:  response.Ids.Tmdb,
+		},
+		Tagline:               response.Tagline,
+		Overview:              response.Overview,
+		Released:              response.Released,
+		Runtime:               response.Runtime,
+		Country:               response.Country,
+		Trailer:               response.Trailer,
+		Homepage:              response.Homepage,
+		Status:                response.Status,
+		Rating:                response.Rating,
+		Votes:                 response.Votes,
+		CommentCount:          response.CommentCount,
+		Language:              response.Language,
+		AvailableTranslations: response.AvailableTranslations,
+		Genres:                response.Genres,
+		Certification:         response.Certification,
+	}
 }
 
 func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
@@ -219,7 +260,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		}
 
 		// decode response
-		var s TraktMoviesResponse
+		var s []TraktMoviesResponse
 		if err := resp.ToJSON(&s); err != nil {
 			_ = resp.Response().Body.Close()
 			return nil, errors.WithMessage(err, "failed decoding movies api response")
@@ -230,7 +271,11 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		// process response
 		for _, item := range s {
 			// set movie item
-			var movieItem TraktMovie = item.Movie
+			var movieItem *TraktMovie = p.translateTraktMovie(item)
+			if movieItem == nil {
+				p.log.Tracef("Failed translating trakt movie: %#v", item)
+				continue
+			}
 
 			// skip this item?
 			if movieItem.Ids.Slug == "" {
@@ -262,6 +307,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				TvdbId:    "",
 				TmdbId:    itemId,
 				ImdbId:    movieItem.Ids.Imdb,
+				Slug:      movieItem.Ids.Slug,
 				Title:     movieItem.Title,
 				Network:   "",
 				Date:      date,

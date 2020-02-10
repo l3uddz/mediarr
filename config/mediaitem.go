@@ -7,6 +7,7 @@ type MediaItem struct {
 	TvdbId    string
 	TmdbId    string
 	ImdbId    string
+	Slug      string
 	Title     string
 	Network   string
 	Date      time.Time
