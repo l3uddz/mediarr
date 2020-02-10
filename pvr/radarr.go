@@ -43,20 +43,20 @@ type RadarrMovies struct {
 	TmdbId int
 }
 
-type RadarrAddMovieRequest struct {
-	Title               string                `json:"title"`
-	TitleSlug           string                `json:"titleSlug"`
-	Year                int                   `json:"year"`
-	QualityProfileId    int                   `json:"qualityProfileId"`
-	Images              []string              `json:"images"`
-	Monitored           bool                  `json:"monitored"`
-	RootFolderPath      string                `json:"rootFolderPath"`
-	MinimumAvailability string                `json:"minimumAvailability"`
-	AddOptions          RadarrAddMovieOptions `json:"addOptions"`
-	TmdbId              int                   `json:"tmdbId"`
+type RadarrAddRequest struct {
+	Title               string           `json:"title"`
+	TitleSlug           string           `json:"titleSlug"`
+	Year                int              `json:"year"`
+	QualityProfileId    int              `json:"qualityProfileId"`
+	Images              []string         `json:"images"`
+	Monitored           bool             `json:"monitored"`
+	RootFolderPath      string           `json:"rootFolderPath"`
+	MinimumAvailability string           `json:"minimumAvailability"`
+	AddOptions          RadarrAddOptions `json:"addOptions"`
+	TmdbId              int              `json:"tmdbId"`
 }
 
-type RadarrAddMovieOptions struct {
+type RadarrAddOptions struct {
 	SearchForMovie             bool `json:"searchForMovie"`
 	IgnoreEpisodesWithFiles    bool `json:"ignoreEpisodesWithFiles"`
 	IgnoreEpisodesWithoutFiles bool `json:"ignoreEpisodesWithoutFiles"`
@@ -232,7 +232,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 	}
 
 	// set request params
-	params := RadarrAddMovieRequest{
+	params := RadarrAddRequest{
 		Title:               item.Title,
 		TitleSlug:           item.Slug,
 		Year:                item.Year,
@@ -241,7 +241,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 		Monitored:           true,
 		RootFolderPath:      p.cfg.RootFolder,
 		MinimumAvailability: "released",
-		AddOptions: RadarrAddMovieOptions{
+		AddOptions: RadarrAddOptions{
 			SearchForMovie:             true,
 			IgnoreEpisodesWithFiles:    false,
 			IgnoreEpisodesWithoutFiles: false,

@@ -77,6 +77,18 @@ var showsCmd = &cobra.Command{
 		// iterate accepted items
 		for _, mediaItem := range foundMediaItems {
 			log.Infof("Adding: %s", mediaItem.String())
+
+			// skip when dry-run is enabled
+			if flagDryRun {
+				continue
+			}
+
+			// add series
+			if err := pvr.AddMedia(&mediaItem); err != nil {
+				log.WithError(err).Error("Failed...")
+			} else {
+				log.Info("Added!")
+			}
 		}
 	},
 }

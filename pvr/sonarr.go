@@ -42,6 +42,28 @@ type SonarrSeries struct {
 	TvdbId int
 }
 
+type SonarrAddRequest struct {
+	Title            string           `json:"title"`
+	TitleSlug        string           `json:"titleSlug"`
+	Year             int              `json:"year"`
+	QualityProfileId int              `json:"qualityProfileId"`
+	Images           []string         `json:"images"`
+	Tags             []string         `json:"tags"`
+	Monitored        bool             `json:"monitored"`
+	RootFolderPath   string           `json:"rootFolderPath"`
+	AddOptions       SonarrAddOptions `json:"addOptions"`
+	Seasons          []string         `json:"seasons"`
+	SeriesType       string           `json:"seriesType"`
+	SeasonFolder     bool             `json:"seasonFolder"`
+	TvdbId           int              `json:"tvdbId"`
+}
+
+type SonarrAddOptions struct {
+	SearchForMissingEpisodes   bool `json:"searchForMissingEpisodes"`
+	IgnoreEpisodesWithFiles    bool `json:"ignoreEpisodesWithFiles"`
+	IgnoreEpisodesWithoutFiles bool `json:"ignoreEpisodesWithoutFiles"`
+}
+
 /* Initializer */
 
 func NewSonarr(name string, c *config.Pvr) *Sonarr {
@@ -205,6 +227,46 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 }
 
 func (p *Sonarr) AddMedia(item *config.MediaItem) error {
+	// convert TvdbId to int
+	tvdbId, err := strconv.Atoi(item.TvdbId)
+	if err != nil {
+		return fmt.Errorf("failed converting tvdb id to int: %q", item.TvdbId)
+	}
+
+	// set request params
+	params := SonarrAddRequest{
+		Title:            item.Title,
+		TitleSlug:        item.Slug,
+		Year:             item.Year,
+		QualityProfileId: p.qualityProfileId,
+		Images:           []string{},
+		Tags:             []string{},
+		Monitored:        true,
+		RootFolderPath:   p.cfg.RootFolder,
+		AddOptions: SonarrAddOptions{
+			SearchForMissingEpisodes:   true,
+			IgnoreEpisodesWithFiles:    false,
+			IgnoreEpisodesWithoutFiles: false,
+		},
+		Seasons:      []string{},
+		SeriesType:   "standard",
+		SeasonFolder: true,
+		TvdbId:       tvdbId,
+	}
+
+	// send request
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,
+		req.BodyJSON(params))
+	if err != nil {
+		return errors.New("failed retrieving add series api response")
+	}
+	defer resp.Response().Body.Close()
+
+	// validate response
+	if resp.Response().StatusCode != 200 && resp.Response().StatusCode != 201 {
+		return fmt.Errorf("failed retrieving valid add series api response: %s", resp.Response().Status)
+	}
+
 	return nil
 }
 
