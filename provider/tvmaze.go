@@ -5,6 +5,7 @@ import (
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
+	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -247,6 +248,10 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// media item wanted?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Tracef("Ignoring: %+v", mediaItem)
+			ignoredItemsSize += 1
+			continue
+		} else if !media.ValidateTvdbId(itemId) {
+			p.log.Tracef("Bad TvdbId, ignoring: %+v", mediaItem)
 			ignoredItemsSize += 1
 			continue
 		} else {
