@@ -16,8 +16,9 @@ import (
 /* Struct */
 
 type TvMaze struct {
-	log *logrus.Entry
-	cfg *config.Provider
+	log               *logrus.Entry
+	cfg               *config.Provider
+	fnAcceptMediaItem func(*config.MediaItem) bool
 
 	apiUrl string
 	apiKey string
@@ -100,8 +101,10 @@ type TvMazeScheduleItem struct {
 
 func NewTvMaze() *TvMaze {
 	return &TvMaze{
-		log:    logger.GetLogger("tvmaze"),
-		cfg:    nil,
+		log:               logger.GetLogger("tvmaze"),
+		cfg:               nil,
+		fnAcceptMediaItem: nil,
+
 		apiUrl: "http://api.tvmaze.com",
 		apiKey: "",
 
@@ -130,6 +133,10 @@ func (p *TvMaze) Init(mediaType MediaType, cfg *config.Provider) error {
 	p.rl = web.GetRateLimiter("tvmaze", 2)
 
 	return nil
+}
+
+func (p *TvMaze) SetAcceptMediaItemFn(fn func(*config.MediaItem) bool) {
+	p.fnAcceptMediaItem = fn
 }
 
 func (p *TvMaze) GetShowsSearchTypes() []string {
@@ -186,21 +193,16 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		return nil, errors.WithMessage(err, "failed decoding full schedule api response")
 	}
 
-	// process response
-	mediaItems := make(map[string]config.MediaItem, 0)
-	mediaItemsSize := 0
-
 	// parse logic params
-	var wantCallback func(mediaItem *config.MediaItem) bool = nil
 	limit := 0
 
 	if v := getLogicParam(logic, "limit"); v != nil {
 		limit = v.(int)
 	}
 
-	if v := getLogicParam(logic, "want-callback"); v != nil {
-		wantCallback = v.(func(*config.MediaItem) bool)
-	}
+	// process response
+	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItemsSize := 0
 
 	for _, item := range s {
 		// skip invalid items
@@ -242,7 +244,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		}
 
 		// media item wanted?
-		if wantCallback != nil && !wantCallback(&mediaItem) {
+		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Tracef("Ignoring: %+v", mediaItem)
 			continue
 		} else {

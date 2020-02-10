@@ -17,8 +17,9 @@ import (
 /* Struct */
 
 type Tmdb struct {
-	log *logrus.Entry
-	cfg *config.Provider
+	log               *logrus.Entry
+	cfg               *config.Provider
+	fnAcceptMediaItem func(*config.MediaItem) bool
 
 	apiUrl string
 	apiKey string
@@ -69,8 +70,10 @@ type TmdbMoviesNowPlaying struct {
 
 func NewTmdb() *Tmdb {
 	return &Tmdb{
-		log:    logger.GetLogger("tmdb"),
-		cfg:    nil,
+		log:               logger.GetLogger("tmdb"),
+		cfg:               nil,
+		fnAcceptMediaItem: nil,
+
 		apiUrl: "https://api.themoviedb.org/3",
 		apiKey: "",
 		genres: make(map[int]string, 0),
@@ -114,6 +117,10 @@ func (p *Tmdb) Init(mediaType MediaType, cfg *config.Provider) error {
 	}
 
 	return nil
+}
+
+func (p *Tmdb) SetAcceptMediaItemFn(fn func(*config.MediaItem) bool) {
+	p.fnAcceptMediaItem = fn
 }
 
 func (p *Tmdb) GetShowsSearchTypes() []string {
@@ -221,16 +228,11 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 	p.log.Tracef("Request params: %+v", params)
 
 	// parse logic params
-	var wantCallback func(mediaItem *config.MediaItem) bool = nil
 	limit := 0
 	limitReached := false
 
 	if v := getLogicParam(logic, "limit"); v != nil {
 		limit = v.(int)
-	}
-
-	if v := getLogicParam(logic, "want-callback"); v != nil {
-		wantCallback = v.(func(*config.MediaItem) bool)
 	}
 
 	// fetch all page results
@@ -309,7 +311,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			}
 
 			// media item wanted?
-			if wantCallback != nil && !wantCallback(&mediaItem) {
+			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Tracef("Ignoring: %+v", mediaItem)
 				continue
 			} else {

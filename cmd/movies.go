@@ -33,6 +33,8 @@ var moviesCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
+		provider.SetAcceptMediaItemFn(shouldAcceptMediaItem)
+
 		// validate provider supports search type
 		if supported := provider.SupportsMoviesSearchType(flagSearchType); !supported {
 			log.WithField("search_type", flagSearchType).Fatalf("Unsupported search type, valid types: %s",
@@ -52,8 +54,7 @@ var moviesCmd = &cobra.Command{
 
 		// build logic map
 		logic := map[string]interface{}{
-			"limit":         flagLimit,
-			"want-callback": shouldAcceptMediaItem,
+			"limit": flagLimit,
 		}
 
 		// build param map

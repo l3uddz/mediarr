@@ -33,6 +33,8 @@ var showsCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
+		provider.SetAcceptMediaItemFn(shouldAcceptMediaItem)
+
 		// init pvr object
 		if err := pvr.Init(pvrObj.SHOW); err != nil {
 			log.WithError(err).Fatalf("Failed initializing pvr object for: %s", pvrName)
@@ -52,8 +54,7 @@ var showsCmd = &cobra.Command{
 
 		// build logic map
 		logic := map[string]interface{}{
-			"limit":         flagLimit,
-			"want-callback": shouldAcceptMediaItem,
+			"limit": flagLimit,
 		}
 
 		// build param map
