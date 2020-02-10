@@ -25,10 +25,10 @@ var (
 
 func Get(providerType string) (Interface, error) {
 	switch strings.ToLower(providerType) {
-	case "tvmaze":
-		return NewTvMaze(), nil
-	case "tmdb":
-		return NewTmdb(), nil
+	//case "tvmaze":
+	//	return NewTvMaze(), nil
+	//case "tmdb":
+	//	return NewTmdb(), nil
 	case "trakt":
 		return NewTrakt(), nil
 	default:
