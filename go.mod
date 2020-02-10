@@ -20,7 +20,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
-	go.uber.org/atomic v1.5.1
+	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/ratelimit v0.1.0
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0 // indirect
 	golang.org/x/sys v0.0.0-20191228213918-04cbcbbfeed8 // indirect

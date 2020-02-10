@@ -12,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"go.uber.org/atomic"
 	"os"
 	"path/filepath"
 	"strings"
@@ -37,10 +36,10 @@ var (
 	flagRating   string
 	flagNetwork  string
 	flagStatus   string
+	flagDryRun   bool
 
 	// Global vars
-	log             *logrus.Entry
-	continueRunning *atomic.Bool
+	log *logrus.Entry
 
 	pvrName      string
 	lowerPvrName string
@@ -80,6 +79,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&flagLogFile, "log", "l", flagLogFile, "Log file")
 	rootCmd.PersistentFlags().CountVarP(&flagLogLevel, "verbose", "v", "Verbose level")
 
+	rootCmd.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "Dry run mode")
 }
 
 func initConfig() {
@@ -109,9 +109,6 @@ func initConfig() {
 	if err := config.Init(flagConfigFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize config")
 	}
-
-	// Init Globals
-	continueRunning = atomic.NewBool(true)
 }
 
 /* Private Helpers */
