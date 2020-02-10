@@ -17,6 +17,7 @@ type MediaItem struct {
 	Date      time.Time
 	Year      int
 	Runtime   int
+	Status    string
 	Genres    []string
 	Languages []string
 }

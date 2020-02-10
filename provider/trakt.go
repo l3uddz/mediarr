@@ -412,6 +412,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Date:      date,
 				Year:      date.Year(),
 				Runtime:   movieItem.Runtime,
+				Status:    movieItem.Status,
 				Genres:    movieItem.Genres,
 				Languages: []string{movieItem.Language},
 			}
@@ -554,6 +555,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				Date:      showItem.FirstAired,
 				Year:      showItem.FirstAired.Year(),
 				Runtime:   showItem.Runtime,
+				Status:    showItem.Status,
 				Genres:    showItem.Genres,
 				Languages: []string{showItem.Language},
 			}
