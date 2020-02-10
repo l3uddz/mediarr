@@ -74,7 +74,7 @@ var moviesCmd = &cobra.Command{
 
 		// iterate accepted items
 		for _, mediaItem := range foundMediaItems {
-			log.Infof("Accepted: %+v", mediaItem)
+			log.Infof("Adding: %s", mediaItem.String())
 		}
 	},
 }

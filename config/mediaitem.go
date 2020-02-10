@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type MediaItem struct {
 	Provider  string
@@ -23,9 +26,14 @@ type ExprEnv struct {
 	Now func() time.Time
 }
 
+/* Public */
 func GetExprEnv(media *MediaItem) *ExprEnv {
 	return &ExprEnv{
 		MediaItem: *media,
 		Now:       func() time.Time { return time.Now().UTC() },
 	}
+}
+
+func (m *MediaItem) String() string {
+	return fmt.Sprintf("%s (%d)", m.Title, m.Year)
 }
