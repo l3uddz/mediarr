@@ -26,10 +26,12 @@ func GetRateLimiter(name string, newRateLimit int) *ratelimit.Limiter {
 	// retrieve or create new ratelimit
 	var rl ratelimit.Limiter
 	ok := false
+	lowerName := strings.ToLower(name)
 
-	rl, ok = rateLimiters[strings.ToLower(name)]
+	rl, ok = rateLimiters[lowerName]
 	if !ok {
 		rl = ratelimit.New(newRateLimit, ratelimit.WithoutSlack)
+		rateLimiters[lowerName] = rl
 
 		log.WithFields(logrus.Fields{
 			"name":  name,
