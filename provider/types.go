@@ -12,6 +12,6 @@ const (
 	SearchTypeNow      string = "now_playing"
 	SearchTypeUpcoming string = "upcoming"
 	SearchTypePopular  string = "popular"
-
 	SearchTypeTrending string = "trending"
+	SearchTypeWatched string = "watched"
 )

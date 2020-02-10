@@ -124,12 +124,14 @@ func NewTrakt() *Trakt {
 			SearchTypePopular,
 			SearchTypeTrending,
 			SearchTypeUpcoming,
+			SearchTypeWatched,
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
 			SearchTypeUpcoming,
 			SearchTypePopular,
 			SearchTypeNow,
+			SearchTypeWatched,
 		},
 	}
 }
@@ -195,6 +197,8 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		return p.getShows("/shows/trending", logic, params)
 	case SearchTypeUpcoming:
 		return p.getShows("/shows/anticipated", logic, params)
+	case SearchTypeWatched:
+		return p.getShows("/shows/watched", logic, params)
 	default:
 		break
 	}
@@ -213,6 +217,8 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		return p.getMovies("/movies/trending", logic, params)
 	case SearchTypeNow:
 		return p.getMovies("/movies/boxoffice", logic, params)
+	case SearchTypeWatched:
+		return p.getMovies("/movies/watched", logic, params)
 	default:
 		break
 	}
