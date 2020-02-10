@@ -6,6 +6,7 @@ import (
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
+	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -116,6 +117,8 @@ func NewTrakt() *Trakt {
 
 		supportedShowsSearchTypes: []string{
 			SearchTypePopular,
+			SearchTypeTrending,
+			SearchTypeUpcoming,
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -183,6 +186,10 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 	switch searchType {
 	case SearchTypePopular:
 		return p.getShows("/shows/popular", logic, params)
+	case SearchTypeTrending:
+		return p.getShows("/shows/trending", logic, params)
+	case SearchTypeUpcoming:
+		return p.getShows("/shows/anticipated", logic, params)
 	default:
 		break
 	}
@@ -234,6 +241,10 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 			reqParams["years"] = v
 		case "rating":
 			reqParams["ratings"] = v
+		case "network":
+			reqParams["networks"] = v
+		case "status":
+			reqParams["status"] = v
 		default:
 			break
 		}
@@ -550,6 +561,10 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			// media item wanted?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Tracef("Ignoring: %+v", mediaItem)
+				ignoredItemsSize += 1
+				continue
+			} else if !media.ValidateTvdbId(itemId) {
+				p.log.Tracef("Ignoring, bad TvdbId: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
 			} else {

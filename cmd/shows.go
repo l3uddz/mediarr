@@ -61,6 +61,11 @@ var showsCmd = &cobra.Command{
 		params := map[string]string{
 			"country":  flagCountry,
 			"language": flagLanguage,
+			"genre":    flagGenre,
+			"year":     flagYear,
+			"rating":   flagRating,
+			"network":  flagNetwork,
+			"status":   flagStatus,
 		}
 
 		// retrieve media
@@ -88,6 +93,11 @@ func init() {
 
 	showsCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
-	showsCmd.Flags().StringVar(&flagCountry, "country", "", "Country to filter results.")
-	showsCmd.Flags().StringVar(&flagLanguage, "language", "", "Language to filter results.")
+	showsCmd.Flags().StringVar(&flagCountry, "country", "", "Countries to filter results.")
+	showsCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
+	showsCmd.Flags().StringVar(&flagGenre, "genre", "", "Genres to filter results.")
+	showsCmd.Flags().StringVar(&flagYear, "year", "", "Years to filter results.")
+	showsCmd.Flags().StringVar(&flagRating, "rating", "", "Ratings to filter results.")
+	showsCmd.Flags().StringVar(&flagNetwork, "network", "", "Networks to filter results.")
+	showsCmd.Flags().StringVar(&flagStatus, "status", "", "Statuses to filter results.")
 }
