@@ -15,6 +15,11 @@ import (
 	"time"
 )
 
+/* Const */
+const (
+	TraktRateLimit int = 3
+)
+
 /* Struct */
 
 type Trakt struct {
@@ -153,7 +158,7 @@ func (p *Trakt) Init(mediaType MediaType, cfg map[string]string) error {
 	}
 
 	// set ratelimiter
-	p.reqRatelimit = web.GetRateLimiter("trakt", 3)
+	p.reqRatelimit = web.GetRateLimiter("trakt", TraktRateLimit)
 
 	// set default retry
 	p.reqRetry = providerDefaultRetry

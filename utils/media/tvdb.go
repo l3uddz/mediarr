@@ -11,7 +11,7 @@ var (
 
 func ValidateTvdbId(tvdbId string) bool {
 	// get ratelimit
-	rl := web.GetRateLimiter("tvdb", 2)
+	rl := web.GetRateLimiter("tvdb", 3)
 
 	// send request
 	resp, err := web.GetResponse(web.GET, "https://www.thetvdb.com/dereferrer/series/"+tvdbId, 30, rl)

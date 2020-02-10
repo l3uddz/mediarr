@@ -14,6 +14,12 @@ import (
 	"time"
 )
 
+/* Const */
+
+const (
+	TmdbRateLimit int = 3
+)
+
 /* Struct */
 
 type Tmdb struct {
@@ -148,7 +154,7 @@ func (p *Tmdb) Init(mediaType MediaType, cfg map[string]string) error {
 	}
 
 	// set ratelimiter
-	p.reqRatelimit = web.GetRateLimiter("tmdb", 3)
+	p.reqRatelimit = web.GetRateLimiter("tmdb", TmdbRateLimit)
 
 	// set default retry
 	p.reqRetry = providerDefaultRetry

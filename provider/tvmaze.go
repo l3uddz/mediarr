@@ -14,6 +14,12 @@ import (
 	"time"
 )
 
+/* Const */
+
+const (
+	TvMazeRateLimit int = 2
+)
+
 /* Struct */
 
 type TvMaze struct {
@@ -132,7 +138,7 @@ func (p *TvMaze) Init(mediaType MediaType, cfg map[string]string) error {
 	p.cfg = cfg
 
 	// set ratelimiter
-	p.reqRatelimit = web.GetRateLimiter("tvmaze", 2)
+	p.reqRatelimit = web.GetRateLimiter("tvmaze", TvMazeRateLimit)
 
 	// set default retry
 	p.reqRetry = providerDefaultRetry
