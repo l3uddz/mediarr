@@ -23,6 +23,7 @@ type Radarr struct {
 	apiUrl           string
 	reqHeaders       req.Header
 	qualityProfileId int
+	timeout          int
 
 	ignoresExpr []*vm.Program
 }
@@ -83,6 +84,7 @@ func NewRadarr(name string, c *config.Pvr) *Radarr {
 		log:        logger.GetLogger(name),
 		apiUrl:     apiUrl,
 		reqHeaders: reqHeaders,
+		timeout:    pvrDefaultTimeout,
 	}
 }
 
@@ -90,7 +92,7 @@ func NewRadarr(name string, c *config.Pvr) *Radarr {
 
 func (p *Radarr) getSystemStatus() (*RadarrSystemStatus, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), 15, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving system status api response")
@@ -196,7 +198,7 @@ func (p *Radarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 
 func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), 15, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return 0, errors.New("failed retrieving quality profiles api response")
@@ -250,7 +252,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/movie"), 60, p.reqHeaders,
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/movie"), p.timeout, p.reqHeaders,
 		req.BodyJSON(params))
 	if err != nil {
 		return errors.New("failed retrieving add movies api response")
@@ -267,7 +269,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 
 func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie"), 60, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving movies api response")

@@ -23,6 +23,7 @@ type Sonarr struct {
 	apiUrl           string
 	reqHeaders       req.Header
 	qualityProfileId int
+	timeout          int
 
 	ignoresExpr []*vm.Program
 }
@@ -85,6 +86,7 @@ func NewSonarr(name string, c *config.Pvr) *Sonarr {
 		log:        logger.GetLogger(name),
 		apiUrl:     apiUrl,
 		reqHeaders: reqHeaders,
+		timeout:    pvrDefaultTimeout,
 	}
 }
 
@@ -92,7 +94,7 @@ func NewSonarr(name string, c *config.Pvr) *Sonarr {
 
 func (p *Sonarr) getSystemStatus() (*SonarrSystemStatus, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), 15, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving system status api response")
@@ -198,7 +200,7 @@ func (p *Sonarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 
 func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), 15, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return 0, errors.New("failed retrieving quality profiles api response")
@@ -255,7 +257,7 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/series"), p.timeout, p.reqHeaders,
 		req.BodyJSON(params))
 	if err != nil {
 		return errors.New("failed retrieving add series api response")
@@ -272,7 +274,7 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 
 func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), 60, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving series api response")

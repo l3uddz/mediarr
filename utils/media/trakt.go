@@ -64,7 +64,7 @@ func LookupTraktId(mediaType string, providerType TraktSearchType, searchId stri
 	searchUrl := fmt.Sprintf("https://api.trakt.tv/search/%s/%s?type=%s", providerType, searchId, mediaType)
 
 	// send request
-	resp, err := web.GetResponse(web.GET, searchUrl, 15, reqHeader, &reqRetry, reqLimit)
+	resp, err := web.GetResponse(web.GET, searchUrl, 30, reqHeader, &reqRetry, reqLimit)
 	if err != nil {
 		return 0, errors.WithMessagef(err, "failed retrieving trakt %s search response for: %q", mediaType, searchId)
 	}
