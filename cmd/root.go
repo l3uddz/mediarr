@@ -118,6 +118,11 @@ func parseValidateInputs(args []string) error {
 	var ok bool = false
 	var err error = nil
 
+	// validate cli flags
+	if flagSearchType == "person" && flagQueryStr == "" {
+		return errors.New("person search must have a --query string, e.g. bryan-cranston")
+	}
+
 	// validate pvr exists in config
 	pvrName = args[0]
 	lowerPvrName = strings.ToLower(pvrName)

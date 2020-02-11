@@ -67,6 +67,8 @@ var showsCmd = &cobra.Command{
 			"rating":   flagRating,
 			"network":  flagNetwork,
 			"status":   flagStatus,
+
+			"query": flagQueryStr,
 		}
 
 		// retrieve media
@@ -106,6 +108,7 @@ func init() {
 
 	showsCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
+	showsCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")
 	showsCmd.Flags().StringVar(&flagCountry, "country", "", "Countries to filter results.")
 	showsCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
 	showsCmd.Flags().StringVar(&flagGenre, "genre", "", "Genres to filter results.")

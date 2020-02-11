@@ -74,8 +74,12 @@ type TraktMoviesResponse struct {
 	Movie *TraktMovie `json:"movie"`
 }
 
-type TraktPersonCastResponse struct {
+type TraktPersonMovieCastResponse struct {
 	Cast []TraktMoviesResponse
+}
+
+type TraktPersonShowCastResponse struct {
+	Cast []TraktShowsResponse
 }
 
 type TraktShowIds struct {
@@ -131,6 +135,7 @@ func NewTrakt() *Trakt {
 			SearchTypeTrending,
 			SearchTypeUpcoming,
 			SearchTypeWatched,
+			SearchTypePerson,
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -210,6 +215,13 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		return p.getShows("/shows/anticipated", logic, params)
 	case SearchTypeWatched:
 		return p.getShows("/shows/watched", logic, params)
+	case SearchTypePerson:
+		queryStr, ok := params["query"]
+		if !ok || queryStr == "" {
+			return nil, errors.New("person search must have a --query string, e.g. bryan-cranston")
+		}
+
+		return p.getShows(fmt.Sprintf("/people/%s/shows", queryStr), logic, params)
 	default:
 		break
 	}
@@ -233,7 +245,7 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 	case SearchTypePerson:
 		queryStr, ok := params["query"]
 		if !ok || queryStr == "" {
-			return nil, errors.New("person search must have a --query string provided, e.g. bryan-cranston")
+			return nil, errors.New("person search must have a --query string, e.g. bryan-cranston")
 		}
 
 		return p.getMovies(fmt.Sprintf("/people/%s/movies", queryStr), logic, params)
@@ -398,11 +410,12 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			}
 		} else {
 			// person search
-			var tmp TraktPersonCastResponse
+			var tmp TraktPersonMovieCastResponse
 			if err := resp.ToJSON(&tmp); err != nil {
 				_ = resp.Response().Body.Close()
-				return nil, errors.WithMessage(err, "failed decoding movies api response")
+				return nil, errors.WithMessage(err, "failed decoding person movies api response")
 			}
+
 			s = tmp.Cast
 		}
 
@@ -576,9 +589,22 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 
 		// decode response
 		var s []TraktShowsResponse
-		if err := resp.ToJSON(&s); err != nil {
-			_ = resp.Response().Body.Close()
-			return nil, errors.WithMessage(err, "failed decoding shows api response")
+
+		if !strings.Contains(endpoint, "/people/") {
+			// non person search
+			if err := resp.ToJSON(&s); err != nil {
+				_ = resp.Response().Body.Close()
+				return nil, errors.WithMessage(err, "failed decoding shows api response")
+			}
+		} else {
+			// person search
+			var tmp TraktPersonShowCastResponse
+			if err := resp.ToJSON(&tmp); err != nil {
+				_ = resp.Response().Body.Close()
+				return nil, errors.WithMessage(err, "failed decoding person shows api response")
+			}
+
+			s = tmp.Cast
 		}
 
 		_ = resp.Response().Body.Close()
