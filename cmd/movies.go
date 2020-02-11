@@ -65,6 +65,8 @@ var moviesCmd = &cobra.Command{
 			"genre":    flagGenre,
 			"year":     flagYear,
 			"rating":   flagRating,
+
+			"query": flagQueryStr,
 		}
 
 		// retrieve media
@@ -104,6 +106,7 @@ func init() {
 
 	moviesCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
+	moviesCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")
 	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Countries to filter results.")
 	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
 	moviesCmd.Flags().StringVar(&flagGenre, "genre", "", "Genres to filter results.")

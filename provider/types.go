@@ -13,5 +13,6 @@ const (
 	SearchTypeUpcoming string = "upcoming"
 	SearchTypePopular  string = "popular"
 	SearchTypeTrending string = "trending"
-	SearchTypeWatched string = "watched"
+	SearchTypeWatched  string = "watched"
+	SearchTypePerson   string = "person"
 )

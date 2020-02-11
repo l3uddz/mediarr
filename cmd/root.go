@@ -29,6 +29,7 @@ var (
 	flagSearchType string
 	flagLimit      int
 
+	flagQueryStr string
 	flagCountry  string
 	flagLanguage string
 	flagGenre    string
