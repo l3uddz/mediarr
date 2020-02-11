@@ -599,11 +599,11 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 
 			// media item wanted?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
-				p.log.Tracef("Ignoring: %+v", mediaItem)
+				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
 			} else if !media.ValidateTvdbId(itemId) {
-				p.log.Tracef("Ignoring, bad TvdbId: %+v", mediaItem)
+				p.log.Debugf("Ignoring, bad TvdbId: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
 			} else {
