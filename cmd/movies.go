@@ -33,6 +33,7 @@ var moviesCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
+		provider.SetIgnoreExistingMediaItemFn(ignoreExistingMediaItem)
 		provider.SetAcceptMediaItemFn(shouldAcceptMediaItem)
 
 		// validate provider supports search type

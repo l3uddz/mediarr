@@ -153,24 +153,7 @@ func parseValidateInputs(args []string) error {
 }
 
 func shouldAcceptMediaItem(mediaItem *config.MediaItem) bool {
-	// item already exists in pvr?
-	if mediaItem.ImdbId != "" {
-		if _, exists := existingMediaItems[mediaItem.ImdbId]; exists {
-			return false
-		}
-	}
-	if mediaItem.TmdbId != "" {
-		if _, exists := existingMediaItems[mediaItem.TmdbId]; exists {
-			return false
-		}
-	}
-	if mediaItem.TvdbId != "" {
-		if _, exists := existingMediaItems[mediaItem.TvdbId]; exists {
-			return false
-		}
-	}
 
-	// pvr should ignore this item?
 	if ignore, err := pvr.ShouldIgnore(mediaItem); err != nil {
 		log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)
 		return false
@@ -179,4 +162,25 @@ func shouldAcceptMediaItem(mediaItem *config.MediaItem) bool {
 	}
 
 	return true
+}
+
+func ignoreExistingMediaItem(mediaItem *config.MediaItem) bool {
+
+	if mediaItem.TvdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.TvdbId]; exists {
+			return true
+		}
+	}
+	if mediaItem.TmdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.TmdbId]; exists {
+			return true
+		}
+	}
+	if mediaItem.ImdbId != "" {
+		if _, exists := existingMediaItems[mediaItem.ImdbId]; exists {
+			return true
+		}
+	}
+
+	return false
 }

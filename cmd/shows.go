@@ -33,6 +33,7 @@ var showsCmd = &cobra.Command{
 			log.WithError(err).Fatalf("Failed initializing provider object for: %s", providerName)
 		}
 
+		provider.SetIgnoreExistingMediaItemFn(ignoreExistingMediaItem)
 		provider.SetAcceptMediaItemFn(shouldAcceptMediaItem)
 
 		// init pvr object

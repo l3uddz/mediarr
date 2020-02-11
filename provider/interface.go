@@ -4,6 +4,7 @@ import "github.com/l3uddz/mediarr/config"
 
 type Interface interface {
 	Init(MediaType, map[string]string) error
+	SetIgnoreExistingMediaItemFn(func(*config.MediaItem) bool)
 	SetAcceptMediaItemFn(func(*config.MediaItem) bool)
 
 	GetShowsSearchTypes() []string

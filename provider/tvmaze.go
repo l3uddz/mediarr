@@ -23,9 +23,10 @@ const (
 /* Struct */
 
 type TvMaze struct {
-	log               *logrus.Entry
-	cfg               map[string]string
-	fnAcceptMediaItem func(*config.MediaItem) bool
+	log                       *logrus.Entry
+	cfg                       map[string]string
+	fnIgnoreExistingMediaItem func(*config.MediaItem) bool
+	fnAcceptMediaItem         func(*config.MediaItem) bool
 
 	apiUrl string
 	apiKey string
@@ -146,6 +147,10 @@ func (p *TvMaze) Init(mediaType MediaType, cfg map[string]string) error {
 	return nil
 }
 
+func (p *TvMaze) SetIgnoreExistingMediaItemFn(fn func(*config.MediaItem) bool) {
+	p.fnIgnoreExistingMediaItem = fn
+}
+
 func (p *TvMaze) SetAcceptMediaItemFn(fn func(*config.MediaItem) bool) {
 	p.fnAcceptMediaItem = fn
 }
@@ -255,13 +260,19 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 			Genres:    []string{item.Embedded.Show.Type},
 		}
 
+		// ignore existing media item
+		if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
+			p.log.Debugf("Ignoring existing: %+v", mediaItem)
+			continue
+		}
+
 		// media item wanted?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
-			p.log.Tracef("Ignoring: %+v", mediaItem)
+			p.log.Debugf("Ignoring: %+v", mediaItem)
 			ignoredItemsSize += 1
 			continue
 		} else if !media.ValidateTvdbId(itemId) {
-			p.log.Tracef("Ignoring, bad TvdbId: %+v", mediaItem)
+			p.log.Debugf("Ignoring, bad TvdbId: %+v", mediaItem)
 			ignoredItemsSize += 1
 			continue
 		} else {

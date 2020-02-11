@@ -23,9 +23,10 @@ const (
 /* Struct */
 
 type Tmdb struct {
-	log               *logrus.Entry
-	cfg               map[string]string
-	fnAcceptMediaItem func(*config.MediaItem) bool
+	log                       *logrus.Entry
+	cfg                       map[string]string
+	fnIgnoreExistingMediaItem func(*config.MediaItem) bool
+	fnAcceptMediaItem         func(*config.MediaItem) bool
 
 	apiUrl string
 	apiKey string
@@ -165,6 +166,10 @@ func (p *Tmdb) Init(mediaType MediaType, cfg map[string]string) error {
 	}
 
 	return nil
+}
+
+func (p *Tmdb) SetIgnoreExistingMediaItemFn(fn func(*config.MediaItem) bool) {
+	p.fnIgnoreExistingMediaItem = fn
 }
 
 func (p *Tmdb) SetAcceptMediaItemFn(fn func(*config.MediaItem) bool) {
@@ -388,9 +393,15 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				Languages: []string{item.OriginalLanguage},
 			}
 
+			// ignore existing media item
+			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
+				p.log.Debugf("Ignoring existing: %+v", mediaItem)
+				continue
+			}
+
 			// media item wanted?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
-				p.log.Tracef("Ignoring: %+v", mediaItem)
+				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
 			} else {
