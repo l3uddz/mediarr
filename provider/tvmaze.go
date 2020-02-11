@@ -220,6 +220,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
+	existingItemsSize := 0
 
 	for _, item := range s {
 		// skip invalid items
@@ -263,6 +264,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// does the pvr already have this item?
 		if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring existing: %+v", mediaItem)
+			existingItemsSize += 1
 			continue
 		}
 
@@ -293,6 +295,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 	p.log.WithFields(logrus.Fields{
 		"accepted": mediaItemsSize,
 		"ignored":  ignoredItemsSize,
+		"existing": existingItemsSize,
 	}).Info("Retrieved media items")
 	return mediaItems, nil
 }

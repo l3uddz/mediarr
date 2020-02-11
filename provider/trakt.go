@@ -366,6 +366,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
+	existingItemsSize := 0
 
 	page := 1
 
@@ -477,6 +478,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
+				existingItemsSize += 1
 				continue
 			}
 
@@ -513,6 +515,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			"pages":    totalPages,
 			"accepted": mediaItemsSize,
 			"ignored":  ignoredItemsSize,
+			"existing": existingItemsSize,
 		}).Info("Retrieved")
 
 		// loop logic
@@ -550,6 +553,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
+	existingItemsSize := 0
 
 	page := 1
 
@@ -634,6 +638,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
+				existingItemsSize += 1
 				continue
 			}
 
@@ -674,6 +679,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			"pages":    totalPages,
 			"accepted": mediaItemsSize,
 			"ignored":  ignoredItemsSize,
+			"existing": existingItemsSize,
 		}).Info("Retrieved")
 
 		// loop logic

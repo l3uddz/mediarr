@@ -320,6 +320,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 	mediaItems := make(map[string]config.MediaItem, 0)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
+	existingItemsSize := 0
 
 	page := 1
 
@@ -395,6 +396,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
+				existingItemsSize += 1
 				continue
 			}
 
@@ -424,6 +426,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			"pages":    s.TotalPages,
 			"accepted": mediaItemsSize,
 			"ignored":  ignoredItemsSize,
+			"exisitng": existingItemsSize,
 		}).Info("Retrieved")
 
 		// loop logic
