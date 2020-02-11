@@ -400,7 +400,11 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				continue
 			} else if movieItem.Released == "" {
 				continue
-			} else if movieItem.Status == "canceled" {
+			} else if lists.StringListContains([]string{
+				"canceled",
+				"rumored",
+				"planned",
+				"in production",}, movieItem.Status, true) {
 				continue
 			}
 
@@ -560,7 +564,10 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				continue
 			} else if showItem.FirstAired.IsZero() {
 				continue
-			} else if showItem.Status == "canceled" {
+			} else if lists.StringListContains([]string{
+				"canceled",
+				"planned",
+				"in production",}, showItem.Status, true) {
 				continue
 			}
 
