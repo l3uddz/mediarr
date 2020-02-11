@@ -234,7 +234,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 			continue
 		}
 
-		// does this media item already exist?
+		// have we already pulled this item?
 		if _, ok := mediaItems[itemId]; ok {
 			continue
 		}
@@ -260,13 +260,13 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 			Genres:    []string{item.Embedded.Show.Type},
 		}
 
-		// ignore existing media item
+		// does the pvr already have this item?
 		if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring existing: %+v", mediaItem)
 			continue
 		}
 
-		// media item wanted?
+		// item passes ignore expressions and is a valid tvdb item?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring: %+v", mediaItem)
 			ignoredItemsSize += 1

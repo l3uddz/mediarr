@@ -408,8 +408,8 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				continue
 			}
 
-			// does item already exist?
-			// -- tmdb
+			// have we already pulled this item?
+			// -- tmdb check
 			itemId := strconv.Itoa(movieItem.Ids.Tmdb)
 			if _, exists := mediaItems[itemId]; exists {
 				continue
@@ -417,7 +417,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				continue
 			}
 
-			// -- imdb
+			// -- imdb check
 			if movieItem.Ids.Imdb != "" {
 				if _, exists := mediaItems[itemId]; exists {
 					continue
@@ -449,13 +449,13 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Languages: []string{movieItem.Language},
 			}
 
-			// ignore existing media item
+			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
 				continue
 			}
 
-			// media item wanted?
+			// item passes ignore expressions?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1
@@ -579,7 +579,8 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				continue
 			}
 
-			// does item already exist?
+			// have we already pulled this item?
+			// - tvdb check
 			itemId := strconv.Itoa(showItem.Ids.Tvdb)
 			if _, exists := mediaItems[itemId]; exists {
 				continue
@@ -605,13 +606,13 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				Languages: []string{showItem.Language},
 			}
 
-			// ignore existing media item
+			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
 				continue
 			}
 
-			// media item wanted?
+			// item passes ignore expressions and is a valid tvdb item?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1

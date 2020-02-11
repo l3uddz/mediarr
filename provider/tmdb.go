@@ -356,9 +356,8 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				continue
 			}
 
-			// does item already exist?
+			// have we already pulled this item?
 			itemId := strconv.Itoa(item.ID)
-
 			if _, exists := mediaItems[itemId]; exists {
 				continue
 			}
@@ -393,13 +392,13 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				Languages: []string{item.OriginalLanguage},
 			}
 
-			// ignore existing media item
+			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
 				continue
 			}
 
-			// media item wanted?
+			// item passes ignore expressions?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1
