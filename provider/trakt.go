@@ -31,6 +31,7 @@ type Trakt struct {
 
 	apiUrl     string
 	apiHeaders req.Header
+	timeout    int
 
 	reqRatelimit *ratelimit.Limiter
 	reqRetry     web.Retry
@@ -127,6 +128,7 @@ func NewTrakt() *Trakt {
 
 		apiUrl:     "https://api.trakt.tv",
 		apiHeaders: make(req.Header, 0),
+		timeout:    providerDefaultTimeout,
 
 		genres: make(map[int]string, 0),
 
@@ -387,8 +389,8 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		reqParams["page"] = page
 
 		// send request
-		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, p.apiHeaders,
-			reqParams, &p.reqRetry, p.reqRatelimit)
+		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), p.timeout, p.apiHeaders, reqParams,
+			&p.reqRetry, p.reqRatelimit)
 		if err != nil {
 			return nil, errors.WithMessage(err, "failed retrieving movies api response")
 		}
@@ -575,8 +577,8 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 		reqParams["page"] = page
 
 		// send request
-		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, p.apiHeaders,
-			reqParams, &p.reqRetry, p.reqRatelimit)
+		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), p.timeout, p.apiHeaders, reqParams,
+			&p.reqRetry, p.reqRatelimit)
 		if err != nil {
 			return nil, errors.WithMessage(err, "failed retrieving shows api response")
 		}

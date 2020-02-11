@@ -28,8 +28,9 @@ type Tmdb struct {
 	fnIgnoreExistingMediaItem func(*config.MediaItem) bool
 	fnAcceptMediaItem         func(*config.MediaItem) bool
 
-	apiUrl string
-	apiKey string
+	apiUrl  string
+	apiKey  string
+	timeout int
 
 	reqRatelimit *ratelimit.Limiter
 	reqRetry     web.Retry
@@ -118,8 +119,10 @@ func NewTmdb() *Tmdb {
 		cfg:               nil,
 		fnAcceptMediaItem: nil,
 
-		apiUrl: "https://api.themoviedb.org/3",
-		apiKey: "",
+		apiUrl:  "https://api.themoviedb.org/3",
+		apiKey:  "",
+		timeout: providerDefaultTimeout,
+
 		genres: make(map[int]string, 0),
 
 		supportedShowsSearchTypes: []string{},
@@ -247,8 +250,8 @@ func (p *Tmdb) loadGenres() error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), providerDefaultTimeout,
-		params, &providerDefaultTimeout, p.reqRatelimit)
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), p.timeout, params,
+		&providerDefaultTimeout, p.reqRatelimit)
 	if err != nil {
 		return errors.WithMessage(err, "failed retrieving genres api response")
 	}
@@ -281,8 +284,8 @@ func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error)
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), providerDefaultTimeout,
-		params, &providerDefaultTimeout, p.reqRatelimit)
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), p.timeout, params,
+		&providerDefaultTimeout, p.reqRatelimit)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
 	}
@@ -329,8 +332,8 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 		reqParams["page"] = page
 
 		// send request
-		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), providerDefaultTimeout, reqParams,
-			&p.reqRetry, p.reqRatelimit)
+		resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, endpoint), p.timeout, reqParams, &p.reqRetry,
+			p.reqRatelimit)
 		if err != nil {
 			return nil, errors.WithMessage(err, "failed retrieving movies api response")
 		}

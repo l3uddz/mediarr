@@ -28,8 +28,9 @@ type TvMaze struct {
 	fnIgnoreExistingMediaItem func(*config.MediaItem) bool
 	fnAcceptMediaItem         func(*config.MediaItem) bool
 
-	apiUrl string
-	apiKey string
+	apiUrl  string
+	apiKey  string
+	timeout int
 
 	reqRatelimit *ratelimit.Limiter
 	reqRetry     web.Retry
@@ -114,8 +115,9 @@ func NewTvMaze() *TvMaze {
 		cfg:               nil,
 		fnAcceptMediaItem: nil,
 
-		apiUrl: "http://api.tvmaze.com",
-		apiKey: "",
+		apiUrl:  "http://api.tvmaze.com",
+		apiKey:  "",
+		timeout: providerDefaultTimeout,
 
 		supportedShowsSearchTypes: []string{
 			SearchTypeSchedule,
@@ -191,8 +193,8 @@ func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, para
 
 func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), providerDefaultTimeout,
-		&p.reqRetry, p.reqRatelimit)
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), p.timeout, &p.reqRetry,
+		p.reqRatelimit)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed retrieving full schedule api response")
 	}

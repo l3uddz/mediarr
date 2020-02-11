@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	providerDefaultTimeout = 15
+	providerDefaultTimeout = 30
 	providerDefaultRetry   = web.Retry{
 		MaxAttempts:          5,
 		RetryableStatusCodes: []int{},
