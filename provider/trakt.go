@@ -409,11 +409,19 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			}
 
 			// does item already exist?
+			// -- tmdb
 			itemId := strconv.Itoa(movieItem.Ids.Tmdb)
 			if _, exists := mediaItems[itemId]; exists {
 				continue
-			} else if _, exists := mediaItems[movieItem.Ids.Imdb]; exists {
+			} else if _, exists := mediaItems[itemId]; exists {
 				continue
+			}
+
+			// -- imdb
+			if movieItem.Ids.Imdb != "" {
+				if _, exists := mediaItems[itemId]; exists {
+					continue
+				}
 			}
 
 			// parse item date
@@ -575,7 +583,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			itemId := strconv.Itoa(showItem.Ids.Tvdb)
 			if _, exists := mediaItems[itemId]; exists {
 				continue
-			} else if _, exists := mediaItems[showItem.Ids.Imdb]; exists {
+			} else if _, exists := mediaItems[itemId]; exists {
 				continue
 			}
 
@@ -595,6 +603,12 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				Status:    showItem.Status,
 				Genres:    showItem.Genres,
 				Languages: []string{showItem.Language},
+			}
+
+			// ignore existing media item
+			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
+				p.log.Debugf("Ignoring existing: %+v", mediaItem)
+				continue
 			}
 
 			// media item wanted?
