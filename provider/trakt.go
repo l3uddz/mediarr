@@ -400,6 +400,8 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				continue
 			} else if movieItem.Released == "" {
 				continue
+			} else if movieItem.Status == "canceled" {
+				continue
 			}
 
 			// does item already exist?
@@ -557,6 +559,8 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			} else if showItem.Runtime == 0 {
 				continue
 			} else if showItem.FirstAired.IsZero() {
+				continue
+			} else if showItem.Status == "canceled" {
 				continue
 			}
 
