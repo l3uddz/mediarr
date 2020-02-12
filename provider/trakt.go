@@ -137,6 +137,8 @@ func NewTrakt() *Trakt {
 			SearchTypeTrending,
 			SearchTypeUpcoming,
 			SearchTypeWatched,
+			SearchTypePlayed,
+			SearchTypeCollected,
 			SearchTypePerson,
 		},
 		supportedMoviesSearchTypes: []string{
@@ -145,6 +147,8 @@ func NewTrakt() *Trakt {
 			SearchTypePopular,
 			SearchTypeNow,
 			SearchTypeWatched,
+			SearchTypePlayed,
+			SearchTypeCollected,
 			SearchTypePerson,
 		},
 	}
@@ -215,8 +219,14 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		return p.getShows("/shows/trending", logic, params)
 	case SearchTypeUpcoming:
 		return p.getShows("/shows/anticipated", logic, params)
-	case SearchTypeWatched:
-		return p.getShows("/shows/watched", logic, params)
+	case SearchTypeWatched, SearchTypePlayed, SearchTypeCollected:
+		// get period from query param (default to weekly if not provided)
+		period, err := p.getPeriodFromQueryStr(params)
+		if err != nil {
+			return nil, err
+		}
+
+		return p.getShows(fmt.Sprintf("/shows/%s/%s", searchType, period), logic, params)
 	case SearchTypePerson:
 		queryStr, ok := params["query"]
 		if !ok || queryStr == "" {
@@ -242,8 +252,13 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		return p.getMovies("/movies/trending", logic, params)
 	case SearchTypeNow:
 		return p.getMovies("/movies/boxoffice", logic, params)
-	case SearchTypeWatched:
-		return p.getMovies("/movies/watched", logic, params)
+	case SearchTypeWatched, SearchTypePlayed, SearchTypeCollected:
+		// get period from query param (default to weekly if not provided)
+		period, err := p.getPeriodFromQueryStr(params)
+		if err != nil {
+			return nil, err
+		}
+		return p.getMovies(fmt.Sprintf("/movies/%s/%s", searchType, period), logic, params)
 	case SearchTypePerson:
 		queryStr, ok := params["query"]
 		if !ok || queryStr == "" {
@@ -259,6 +274,21 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 }
 
 /* Private - Sub-Implements */
+
+func (p *Trakt) getPeriodFromQueryStr(params map[string]string) (string, error) {
+	queryStr, ok := params["query"]
+
+	if ok && queryStr != "" {
+		switch queryStr {
+		case "weekly", "monthly", "yearly", "all":
+			return queryStr, nil
+		default:
+			return "", errors.New("watched search defaults to weekly, valid query params: weekly, monthly, yearly, all")
+		}
+	}
+
+	return "weekly", nil
+}
 
 func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 	// set request params
