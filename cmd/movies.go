@@ -4,6 +4,7 @@ import (
 	"github.com/l3uddz/mediarr/database"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
+	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -75,8 +76,11 @@ var moviesCmd = &cobra.Command{
 			log.WithError(err).Fatal("Failed retrieving media from provider")
 		}
 
+		// sort accepted items
+		sortedMediaItems := media.SortedMediaItemSlice(foundMediaItems, media.SortTypeReleaseDate)
+
 		// iterate accepted items
-		for _, mediaItem := range foundMediaItems {
+		for _, mediaItem := range sortedMediaItems {
 			log.Infof("Adding: %s", mediaItem.String())
 
 			// skip when dry-run is enabled
