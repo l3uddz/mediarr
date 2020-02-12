@@ -1,5 +1,6 @@
 package database
 
-type MediaItem struct {
-	Id                int    `gorm:"primary_key;auto_increment:false"`
+type ValidatedProviderItem struct {
+	Provider string `gorm:"primary_key"`
+	Id       string `gorm:"primary_key"`
 }

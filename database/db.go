@@ -24,7 +24,7 @@ func Init(databaseFilePath string) error {
 	}
 
 	// migrate schema
-	db.AutoMigrate(&MediaItem{})
+	db.AutoMigrate(&ValidatedProviderItem{})
 
 	return nil
 }
