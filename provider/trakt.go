@@ -503,6 +503,10 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				p.log.Debugf("Ignoring: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
+			} else if !media.ValidateTmdbId("movie", itemId) {
+				p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
+				ignoredItemsSize += 1
+				continue
 			} else {
 				p.log.Debugf("Accepted: %+v", mediaItem)
 			}
