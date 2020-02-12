@@ -255,6 +255,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 			TvdbId:    itemId,
 			ImdbId:    item.Embedded.Show.Externals.Imdb,
 			Title:     item.Embedded.Show.Name,
+			Summary:   item.Embedded.Show.Summary,
 			Network:   item.Embedded.Show.Network.Name,
 			Date:      date,
 			Year:      date.Year(),

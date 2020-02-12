@@ -388,6 +388,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				TmdbId:    itemId,
 				ImdbId:    "",
 				Title:     item.Title,
+				Summary:   item.Overview,
 				Network:   "",
 				Date:      date,
 				Year:      date.Year(),
