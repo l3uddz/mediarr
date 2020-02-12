@@ -676,7 +676,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				ignoredItemsSize += 1
 				continue
 			} else if !media.ValidateTvdbId(itemId) {
-				p.log.Debugf("Ignoring, bad TvdbId: %+v", mediaItem)
+				p.log.Debugf("Ignoring, invalid TvdbId: %+v", mediaItem)
 				ignoredItemsSize += 1
 				continue
 			} else {
