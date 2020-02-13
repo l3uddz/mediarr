@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -37,5 +39,9 @@ func GetExprEnv(media *MediaItem) *ExprEnv {
 }
 
 func (m *MediaItem) String() string {
+	if strings.Contains(m.Title, "(" + strconv.Itoa(m.Year) + ")") {
+		return m.Title
+	}
+
 	return fmt.Sprintf("%s (%d)", m.Title, m.Year)
 }
