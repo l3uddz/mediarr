@@ -135,7 +135,7 @@ func NewTrakt() *Trakt {
 		supportedShowsSearchTypes: []string{
 			SearchTypePopular,
 			SearchTypeTrending,
-			SearchTypeUpcoming,
+			SearchTypeAnticipated,
 			SearchTypeWatched,
 			SearchTypePlayed,
 			SearchTypeCollected,
@@ -143,7 +143,7 @@ func NewTrakt() *Trakt {
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
-			SearchTypeUpcoming,
+			SearchTypeAnticipated,
 			SearchTypePopular,
 			SearchTypeNow,
 			SearchTypeWatched,
@@ -217,7 +217,7 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		return p.getShows("/shows/popular", logic, params)
 	case SearchTypeTrending:
 		return p.getShows("/shows/trending", logic, params)
-	case SearchTypeUpcoming:
+	case SearchTypeAnticipated:
 		return p.getShows("/shows/anticipated", logic, params)
 	case SearchTypeWatched, SearchTypePlayed, SearchTypeCollected:
 		// get period from query param (default to weekly if not provided)
@@ -246,7 +246,7 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 	switch searchType {
 	case SearchTypePopular:
 		return p.getMovies("/movies/popular", logic, params)
-	case SearchTypeUpcoming:
+	case SearchTypeAnticipated:
 		return p.getMovies("/movies/anticipated", logic, params)
 	case SearchTypeTrending:
 		return p.getMovies("/movies/trending", logic, params)

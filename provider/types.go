@@ -8,13 +8,14 @@ const (
 )
 
 const (
-	SearchTypeSchedule  string = "schedule"
-	SearchTypeNow              = "now_playing"
-	SearchTypeUpcoming         = "upcoming"
-	SearchTypePopular          = "popular"
-	SearchTypeTrending         = "trending"
-	SearchTypeWatched          = "watched"
-	SearchTypePlayed           = "played"
-	SearchTypeCollected        = "collected"
-	SearchTypePerson           = "person"
+	SearchTypeSchedule    string = "schedule"
+	SearchTypeNow                = "now_playing"
+	SearchTypeUpcoming           = "upcoming"
+	SearchTypeAnticipated        = "anticipated"
+	SearchTypePopular            = "popular"
+	SearchTypeTrending           = "trending"
+	SearchTypeWatched            = "watched"
+	SearchTypePlayed             = "played"
+	SearchTypeCollected          = "collected"
+	SearchTypePerson             = "person"
 )
