@@ -1,9 +1,11 @@
 package provider
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
+	"github.com/l3uddz/mediarr/database"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/web"
@@ -278,6 +280,18 @@ func (p *Tmdb) loadGenres() error {
 }
 
 func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error) {
+	// check database for this item
+	existingItemJson, err := database.GetMetadataItem("tmdb", tmdbId)
+	if err == nil && existingItemJson != nil {
+		// item was found in database, unmarshal
+		var n TmdbMovieDetailsResponse
+		if err := json.Unmarshal([]byte(*existingItemJson), &n); err != nil {
+			p.log.WithError(err).Errorf("Failed decoding metadata stored in database for tmdb id: %q", tmdbId)
+		} else {
+			return &n, nil
+		}
+	}
+
 	// set request params
 	params := req.Param{
 		"api_key": p.apiKey,
@@ -300,6 +314,11 @@ func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error)
 	var s TmdbMovieDetailsResponse
 	if err := resp.ToJSON(&s); err != nil {
 		return nil, errors.WithMessage(err, "failed decoding movie details api response")
+	}
+
+	// add item to database
+	if err := database.AddMetadataItem("tmdb", tmdbId, s); err != nil {
+		logrus.WithError(err).Errorf("Failed adding metadata item to database for tmdb id: %q", tmdbId)
 	}
 
 	return &s, nil
@@ -402,6 +421,20 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
 				existingItemsSize += 1
 				continue
+			}
+
+			// retrieve additional movie details
+			movieDetails, err := p.getMovieDetails(itemId)
+			if err != nil {
+				// skip this item as it failed tmdb id validation
+				p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
+				ignoredItemsSize += 1
+				continue
+			} else {
+				// set additional movie details
+				mediaItem.Runtime = movieDetails.Runtime
+				mediaItem.ImdbId = movieDetails.ImdbID
+				mediaItem.Status = movieDetails.Status
 			}
 
 			// item passes ignore expressions?

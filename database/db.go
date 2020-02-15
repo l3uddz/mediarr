@@ -3,13 +3,15 @@ package database
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/l3uddz/mediarr/logger"
 	stringutils "github.com/l3uddz/mediarr/utils/strings"
 )
 
 var (
-	db  *gorm.DB
-	log = logger.GetLogger("db")
+	db   *gorm.DB
+	log  = logger.GetLogger("db")
+	json = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
 func Init(databaseFilePath string) error {
@@ -24,7 +26,7 @@ func Init(databaseFilePath string) error {
 	}
 
 	// migrate schema
-	db.AutoMigrate(&ValidatedProviderItem{})
+	db.AutoMigrate(&ValidatedProviderItem{}, &ProviderItemMetadata{})
 
 	return nil
 }
