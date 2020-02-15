@@ -1,3 +1,10 @@
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-blue.svg?style=flat-square)](https://www.python.org/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%203-blue.svg?style=flat-square)](https://github.com/l3uddz/mediarr/blob/master/LICENSE.md)
+[![last commit (develop)](https://img.shields.io/github/last-commit/l3uddz/mediarr/develop.svg?colorB=177DC1&label=Last%20Commit&style=flat-square)](https://github.com/l3uddz/mediarr/commits/develop)
+[![Discord](https://img.shields.io/discord/381077432285003776.svg?colorB=177DC1&label=Discord&style=flat-square)](https://discord.io/cloudbox)
+[![Contributing](https://img.shields.io/badge/Contributing-gray.svg?style=flat-square)](CONTRIBUTING.md)
+[![Donate](https://img.shields.io/badge/Donate-gray.svg?style=flat-square)](#donate)
+
 # mediarr
 
 CLI tool to add media to different PVR's in the *arr family from different providers.
@@ -99,3 +106,16 @@ All commands support the `--dry-run` flag to mimic the entire run process with t
 
 - Provider(trakt): support lists
 - Provider(tmdb): support tv
+
+
+***
+
+# Donate
+
+If you find this project helpful, feel free to make a small donation to the developer:
+
+  - [Monzo](https://monzo.me/today): Credit Cards, Apple Pay, Google Pay
+
+  - [Paypal: l3uddz@gmail.com](https://www.paypal.me/l3uddz)
+
+  - BTC: 3CiHME1HZQsNNcDL6BArG7PbZLa8zUUgjL
