@@ -111,8 +111,6 @@ func init() {
 	_ = moviesCmd.MarkFlagRequired("search-type")
 
 	// optional flags
-	moviesCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
-
 	moviesCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
 	moviesCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")

@@ -113,8 +113,6 @@ func init() {
 	_ = showsCmd.MarkFlagRequired("search-type")
 
 	// optional flags
-	showsCmd.Flags().BoolVarP(&flagRefreshCache, "refresh-cache", "r", false, "Refresh the locally stored cache.")
-
 	showsCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
 	showsCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")

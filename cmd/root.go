@@ -24,7 +24,6 @@ var (
 	flagConfigFile   = "config.yaml"
 	flagDatabaseFile = "vault.db"
 	flagLogFile      = "activity.log"
-	flagRefreshCache = false
 
 	flagSearchType string
 	flagLimit      int
