@@ -15,7 +15,7 @@ type MediaItem struct {
 	Slug      string
 	Title     string
 	Summary   string
-	Country   string
+	Country   []string
 	Network   string
 	Date      time.Time
 	Year      int
