@@ -82,19 +82,24 @@ var showsCmd = &cobra.Command{
 		sortedMediaItems := media.SortedMediaItemSlice(foundMediaItems, media.SortTypeReleaseDate)
 
 		// iterate accepted items
+		pos := 0
+		itemsSize := len(sortedMediaItems)
+
 		for _, mediaItem := range sortedMediaItems {
-			log.Infof("Adding: %s", mediaItem.String())
+			pos += 1
 
 			// skip when dry-run is enabled
 			if flagDryRun {
+				log.Infof("Adding %02d/%02d: %s", pos, itemsSize, mediaItem.String())
 				continue
 			}
 
-			// add series
+			// add show
+			log.Debugf("Adding %02d/%02d: %s", pos, itemsSize, mediaItem.String())
 			if err := pvr.AddMedia(&mediaItem); err != nil {
-				log.WithError(err).Error("Failed...")
+				log.WithError(err).Errorf("Failed %02d/%02d: %s", pos, itemsSize, mediaItem.String())
 			} else {
-				log.Info("Added!")
+				log.Infof("Added %02d/%02d: %s", pos, itemsSize, mediaItem.String())
 			}
 		}
 	},
