@@ -68,11 +68,13 @@ type TraktMovie struct {
 	AvailableTranslations []string      `json:"available_translations"`
 	Genres                []string      `json:"genres"`
 	Certification         string        `json:"certification"`
+	Character             string        `json:"character"`
 }
 
 type TraktMoviesResponse struct {
 	TraktMovie
-	Movie *TraktMovie `json:"movie"`
+	Character *string     `json:"character"`
+	Movie     *TraktMovie `json:"movie"`
 }
 
 type TraktPersonMovieCastResponse struct {
@@ -111,11 +113,13 @@ type TraktShow struct {
 	AvailableTranslations []string     `json:"available_translations"`
 	Genres                []string     `json:"genres"`
 	AiredEpisodes         int          `json:"aired_episodes"`
+	Character             string       `json:"character"`
 }
 
 type TraktShowsResponse struct {
 	TraktShow
-	Show *TraktShow `json:"show"`
+	Character *string    `json:"character"`
+	Show      *TraktShow `json:"show"`
 }
 
 /* Initializer */
@@ -328,7 +332,12 @@ func (p *Trakt) getRequestParams(params map[string]string) req.Param {
 
 func (p *Trakt) translateMovie(response TraktMoviesResponse) *TraktMovie {
 	if response.Movie != nil {
-		return response.Movie
+		m := response.Movie
+		if response.Character != nil && *response.Character != "" {
+			m.Character = *response.Character
+		}
+
+		return m
 	}
 
 	return &TraktMovie{
@@ -355,12 +364,18 @@ func (p *Trakt) translateMovie(response TraktMoviesResponse) *TraktMovie {
 		AvailableTranslations: response.AvailableTranslations,
 		Genres:                response.Genres,
 		Certification:         response.Certification,
+		Character:             "",
 	}
 }
 
 func (p *Trakt) translateShow(response TraktShowsResponse) *TraktShow {
 	if response.Show != nil {
-		return response.Show
+		s := response.Show
+		if response.Character != nil && *response.Character != "" {
+			s.Character = *response.Character
+		}
+
+		return s
 	}
 
 	return &TraktShow{
@@ -505,6 +520,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			// init media item
 			mediaItem := config.MediaItem{
 				Provider:  "trakt",
+				Endpoint:  endpoint,
 				TvdbId:    "",
 				TmdbId:    itemId,
 				ImdbId:    movieItem.Ids.Imdb,
@@ -519,6 +535,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Status:    movieItem.Status,
 				Genres:    movieItem.Genres,
 				Languages: []string{movieItem.Language},
+				Character: movieItem.Character,
 			}
 
 			// does the pvr already have this item?
@@ -683,6 +700,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			// init media item
 			mediaItem := config.MediaItem{
 				Provider:  "trakt",
+				Endpoint:  endpoint,
 				TvdbId:    itemId,
 				TmdbId:    strconv.Itoa(showItem.Ids.Tmdb),
 				ImdbId:    showItem.Ids.Imdb,
@@ -697,6 +715,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				Status:    showItem.Status,
 				Genres:    showItem.Genres,
 				Languages: []string{showItem.Language},
+				Character: showItem.Character,
 			}
 
 			// does the pvr already have this item?

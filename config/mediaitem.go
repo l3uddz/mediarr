@@ -9,6 +9,7 @@ import (
 
 type MediaItem struct {
 	Provider  string
+	Endpoint  string
 	TvdbId    string
 	TmdbId    string
 	ImdbId    string
@@ -23,6 +24,7 @@ type MediaItem struct {
 	Status    string
 	Genres    []string
 	Languages []string
+	Character string
 }
 
 type ExprEnv struct {
@@ -39,7 +41,7 @@ func GetExprEnv(media *MediaItem) *ExprEnv {
 }
 
 func (m *MediaItem) String() string {
-	if strings.Contains(m.Title, "(" + strconv.Itoa(m.Year) + ")") {
+	if strings.Contains(m.Title, "("+strconv.Itoa(m.Year)+")") {
 		return m.Title
 	}
 
