@@ -1,6 +1,6 @@
 # mediarr
 
-Tool to add media to different PVR's in the *arr family.
+CLI tool to add media to different PVR's in the *arr family from different providers.
 
 ## Example Configuration
 
@@ -88,3 +88,14 @@ provider:
 ## Additional Details
 
 All commands support the `--dry-run` flag to mimic the entire run process with the exception of actually adding media to the PVR.
+
+# Planned Features
+
+1. Additions
+
+- Provider(new): simkl
+
+2. Enhancements
+
+- Provider(trakt): support lists
+- Provider(tmdb): support tv
