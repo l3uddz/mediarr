@@ -424,18 +424,18 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			}
 
 			// retrieve additional movie details
-			movieDetails, err := p.getMovieDetails(itemId)
-			if err != nil {
-				// skip this item as it failed tmdb id validation
-				p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
-				ignoredItemsSize += 1
-				continue
-			} else {
-				// set additional movie details
-				mediaItem.Runtime = movieDetails.Runtime
-				mediaItem.ImdbId = movieDetails.ImdbID
-				mediaItem.Status = movieDetails.Status
-			}
+			//movieDetails, err := p.getMovieDetails(itemId)
+			//if err != nil {
+			//	// skip this item as it failed tmdb id validation
+			//	p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
+			//	ignoredItemsSize += 1
+			//	continue
+			//} else {
+			//	// set additional movie details
+			//	mediaItem.Runtime = movieDetails.Runtime
+			//	mediaItem.ImdbId = movieDetails.ImdbID
+			//	mediaItem.Status = movieDetails.Status
+			//}
 
 			// item passes ignore expressions?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
