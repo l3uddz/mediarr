@@ -111,6 +111,7 @@ func init() {
 	_ = moviesCmd.MarkFlagRequired("search-type")
 
 	// optional flags
+	moviesCmd.Flags().BoolVar(&flagNoFilter, "no-filter", false, "No filter expression checking.")
 	moviesCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
 	moviesCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")
