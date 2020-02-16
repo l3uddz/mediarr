@@ -26,6 +26,7 @@ var (
 	flagLogFile      = "activity.log"
 
 	flagSearchType string
+	flagNoFilter   bool
 	flagLimit      int
 
 	flagQueryStr string
@@ -158,6 +159,10 @@ func parseValidateInputs(args []string) error {
 }
 
 func shouldAcceptMediaItem(mediaItem *config.MediaItem) bool {
+	if flagNoFilter {
+		// when no-filter is enabled, dont check ignore filters
+		return true
+	}
 
 	if ignore, err := pvr.ShouldIgnore(mediaItem); err != nil {
 		log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)

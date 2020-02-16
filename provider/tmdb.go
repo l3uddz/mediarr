@@ -403,6 +403,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			// init media item
 			mediaItem := config.MediaItem{
 				Provider:  "tmdb",
+				Endpoint:  endpoint,
 				TvdbId:    "",
 				TmdbId:    itemId,
 				ImdbId:    "",

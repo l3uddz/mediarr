@@ -252,6 +252,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// init media item
 		mediaItem := config.MediaItem{
 			Provider:  "tvmaze",
+			Endpoint:  "/schedule/full",
 			TvdbId:    itemId,
 			ImdbId:    item.Embedded.Show.Externals.Imdb,
 			Title:     item.Embedded.Show.Name,

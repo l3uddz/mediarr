@@ -113,6 +113,7 @@ func init() {
 	_ = showsCmd.MarkFlagRequired("search-type")
 
 	// optional flags
+	showsCmd.Flags().BoolVar(&flagNoFilter, "no-filter", false, "No filter expression checking.")
 	showsCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
 	showsCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")
