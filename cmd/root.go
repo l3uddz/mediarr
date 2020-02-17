@@ -105,11 +105,13 @@ func initConfig() {
 	log.Infof("Using %s = %s (%s@%s)", stringutils.StringLeftJust("VERSION", " ", 10),
 		build.Version, build.GitCommit, build.Timestamp)
 	logger.ShowUsing()
+	log.Info("Develop")
 
 	// Init Config
 	if err := config.Init(flagConfigFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize config")
 	}
+
 }
 
 /* Private Helpers */
