@@ -71,8 +71,6 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	// Parse persistent flags
 	rootCmd.PersistentFlags().StringVar(&flagConfigFolder, "config-dir", flagConfigFolder, "Config folder")
 	rootCmd.PersistentFlags().StringVarP(&flagConfigFile, "config", "c", flagConfigFile, "Config file")
@@ -83,7 +81,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "Dry run mode")
 }
 
-func initConfig() {
+func initCore() {
 	// Set core variables
 	if !rootCmd.PersistentFlags().Changed("config") {
 		flagConfigFile = filepath.Join(flagConfigFolder, flagConfigFile)
@@ -105,13 +103,13 @@ func initConfig() {
 	log.Infof("Using %s = %s (%s@%s)", stringutils.StringLeftJust("VERSION", " ", 10),
 		build.Version, build.GitCommit, build.Timestamp)
 	logger.ShowUsing()
-	log.Info("Develop")
 
 	// Init Config
 	if err := config.Init(flagConfigFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize config")
 	}
 
+	log.Info("------------------")
 }
 
 /* Private Helpers */

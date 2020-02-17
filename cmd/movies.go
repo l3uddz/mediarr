@@ -18,6 +18,9 @@ var moviesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
 
+		// init core
+		initCore()
+
 		// validate core inputs
 		if err := parseValidateInputs(args); err != nil {
 			log.WithError(err).Fatal("Failed validating inputs")
