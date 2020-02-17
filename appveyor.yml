@@ -11,16 +11,6 @@ branches:
     - master
     - develop
 
-deploy:
-  - provider: GitHub
-    auth_token:
-      secure: japCKJyRSrHvPJV0hqZZGcRM9ZSR9GsTVh8SCCwbqiyuKTyB3OCcRMc6ICztczfV
-    artifact: mediarr
-    force_update: true
-    on:
-      branch: master
-      APPVEYOR_REPO_TAG: true
-
 # no need for caching as it does not appear to work right now
 #cache:
 #  - vendor -> go.mod, appveyor.yml
@@ -44,6 +34,14 @@ install:
   - go env
   - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
   - sh: './appveyor-tools/secure-file -decrypt equinox.key.enc -secret $equinox_key_secret -salt $equinox_key_salt'
+  - |-
+    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
+      case "$OSTYPE" in
+        darwin*)  curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-darwin-amd64.zip | unzip release-tool-stable-darwin-amd64.zip -d /usr/local/bin ;;
+        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip | unzip release-tool-stable-linux-amd64.zip -d /usr/local/bin ;;
+        *)        echo "unknown: $OSTYPE" ;;
+      esac
+    fi
 
 before_build:
   - |-
@@ -55,14 +53,6 @@ before_build:
       export EQUINOX_CHANNEL=beta
     else
       export EQUINOX_CHANNEL=stable
-    fi
-  - |-
-    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      case "$OSTYPE" in
-        darwin*)  curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-darwin-amd64.zip | unzip release-tool-stable-darwin-amd64.zip -d /usr/local/bin ;;
-        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip | unzip release-tool-stable-linux-amd64.zip -d /usr/local/bin ;;
-        *)        echo "unknown: $OSTYPE" ;;
-      esac
     fi
 
 build_script:
