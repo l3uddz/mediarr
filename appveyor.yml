@@ -31,19 +31,53 @@ artifacts:
 
 environment:
   GO111MODULE: on
+  equinox_app_id: app_d3GUrCFKy57
+  equinox_app_token:
+    secure: Yo9r16VT0Na2LrgQ9Yz+EiMo1UDoAF0oY+fTN2Fkuo533GipKtLtKALY6lz5NcCjQ99YSx2bT1a9stDb4pSQUw==
+  equinox_key_secret:
+    secure: OxrUAcQMLWdOdnRgQx7mNJLNadQENPPed4kZBkXiEb8EjkI16arh/NNMNwgKTl29
+  equinox_key_salt:
+    secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
   - go version
   - go env
+  - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
+  - sh: './appveyor-tools/secure-file -decrypt equinox.key.enc -secret $equinox_key_secret -salt $equinox_key_salt'
 
 before_build:
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       export VERSION=${APPVEYOR_REPO_TAG_NAME}
     fi
+  - |-
+    if [ ${APPVEYOR_REPO_BRANCH} = "develop" ]; then
+      export EQUINOX_CHANNEL=beta
+    else
+      export EQUINOX_CHANNEL=stable
+    fi
+  - |-
+    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
+      case "$OSTYPE" in
+        darwin*)  curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-darwin-amd64.zip | unzip release-tool-stable-darwin-amd64.zip -d /usr/local/bin ;;
+        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip | unzip release-tool-stable-linux-amd64.zip -d /usr/local/bin ;;
+        *)        echo "unknown: $OSTYPE" ;;
+      esac
+    fi
 
 build_script:
   - make build
+  - |-
+    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
+      CGO=1 equinox release \
+       --version="${APPVEYOR_REPO_TAG_NAME}" \
+       --channel="${EQUINOX_CHANNEL}" \
+       --platforms="darwin_amd64 linux_amd64" \
+       --signing-key=equinox.key \
+       --app="${equinox_app_id}" \
+       --token="${equinox_app_token}" \
+       github.com/l3uddz/mediarr
+    fi
 
 after_build:
   - |-
