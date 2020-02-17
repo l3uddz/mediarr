@@ -37,8 +37,8 @@ install:
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       case "$OSTYPE" in
-        darwin*)  curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-darwin-amd64.zip && unzip release-tool-stable-darwin-amd64.zip -d /usr/local/bin ;;
-        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip && unzip release-tool-stable-linux-amd64.zip -d /usr/local/bin ;;
+        darwin*)  curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-darwin-amd64.zip && sudo unzip release-tool-stable-darwin-amd64.zip -d /usr/local/bin ;;
+        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip && sudo unzip release-tool-stable-linux-amd64.zip -d /usr/local/bin ;;
         *)        echo "unknown: $OSTYPE" ;;
       esac
     fi
