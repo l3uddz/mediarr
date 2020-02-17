@@ -45,20 +45,23 @@ install:
 
 before_build:
   - |-
-    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      export VERSION=${APPVEYOR_REPO_TAG_NAME}
-      export TIMESTAMP=$(shell date +%s)
-      export GIT_COMMIT=$(shell git rev-parse --short HEAD)
-    fi
-  - |-
     if [ ${APPVEYOR_REPO_BRANCH} = "develop" ]; then
       export EQUINOX_CHANNEL=beta
     else
       export EQUINOX_CHANNEL=stable
     fi
+  - |-
+    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
+      export VERSION=${APPVEYOR_REPO_TAG_NAME}
+    fi
 
 build_script:
   - make build
+  - |-
+    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
+      export TIMESTAMP=$(shell date +%s)
+      export GIT_COMMIT=$(shell git rev-parse --short HEAD)
+    fi
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       CGO=1 equinox release \
