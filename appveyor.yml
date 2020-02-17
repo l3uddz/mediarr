@@ -56,13 +56,12 @@ before_build:
 
 build_script:
   - make build
-  - GOOS=darwin make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       CGO=1 equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
-       --platforms="linux_amd64 darwin_amd64" \
+       --platforms="linux_amd64 darwin_amd64 windows_amd64" \
        --signing-key=equinox.key \
        --app="${equinox_app_id}" \
        --token="${equinox_app_token}" \
