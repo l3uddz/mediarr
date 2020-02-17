@@ -53,6 +53,11 @@ before_build:
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       export VERSION=${APPVEYOR_REPO_TAG_NAME}
+      case "$OSTYPE" in
+        darwin*)  export EQUINOX_BUILD_PLATFORM=darwin_amd64 ;;
+        linux*)   export EQUINOX_BUILD_PLATFORM=linux_amd64 ;;
+        *)        echo "unknown: $OSTYPE" ;;
+      esac
     fi
 
 build_script:
@@ -67,7 +72,7 @@ build_script:
       CGO=1 equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
-       --platforms="darwin_amd64 linux_amd64" \
+       --platforms="${EQUINOX_BUILD_PLATFORM}" \
        --signing-key=equinox.key \
        --app="${equinox_app_id}" \
        --token="${equinox_app_token}" \
