@@ -40,7 +40,9 @@ var updateCmd = &cobra.Command{
 		initCore()
 
 		// init updater
-		var opts equinox.Options
+		opts := equinox.Options{
+			Channel: channelName,
+		}
 		if err := opts.SetPublicKeyPEM(equinoxKeyPub); err != nil {
 			log.WithError(err).Fatal("Failed initializing updater...")
 		}
@@ -49,19 +51,19 @@ var updateCmd = &cobra.Command{
 		resp, err := equinox.Check(equinoxAppId, opts)
 		switch {
 		case err == equinox.NotAvailableErr:
-			log.Info("No update available, already using the latest version!")
+			log.Infof("No %q update available, already using the latest version!", channelName)
 			os.Exit(0)
 		case err != nil:
-			log.WithError(err).Fatal("Failed updating to latest %q version", channelName)
+			log.WithError(err).Fatalf("Failed checking for latest %q version", channelName)
 		}
 
 		// fetch the update and apply it
 		err = resp.Apply()
 		if err != nil {
-			log.WithError(err).Fatal("Failed updating to latest %q version: %s", channelName, resp.ReleaseVersion)
+			log.WithError(err).Fatalf("Failed updating to latest %q version: %s", channelName, resp.ReleaseVersion)
 		}
 
-		log.Info("Updated to latest %q version: %s", channelName, resp.ReleaseVersion)
+		log.Infof("Updated to latest %q version: %s", channelName, resp.ReleaseVersion)
 	},
 }
 
