@@ -1,10 +1,9 @@
 package web
 
 import (
+	"context"
 	"go.uber.org/ratelimit"
 	"io/ioutil"
-	"net"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -20,15 +19,6 @@ import (
 var (
 	// Logging
 	log = logger.GetLogger("web")
-
-	// HTTP client
-	httpClient = &http.Client{
-		Transport: &http.Transport{
-			Dial: (&net.Dialer{
-				Timeout: 10 * time.Second,
-			}).Dial,
-		},
-	}
 )
 
 /* Structs */
@@ -53,19 +43,17 @@ const (
 	DELETE
 )
 
+/* Private */
+
+func init() {
+	req.SetJSONEscapeHTML(false)
+}
+
 /* Public */
 
 func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interface{}) (*req.Resp, error) {
-	// prepare request
-	client := httpClient
-	client.Timeout = time.Duration(timeout) * time.Second
-
-	req.SetJSONEscapeHTML(false)
-
 	inputs := make([]interface{}, 0)
-	inputs = append(inputs, client)
 
-	// Extract Retry struct and/or ratelimit object, append everything else
 	var rl ratelimit.Limiter = nil
 	var retry Retry
 
@@ -82,6 +70,12 @@ func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interfa
 		default:
 			inputs = append(inputs, vT)
 		}
+	}
+
+	// add context if available
+	if timeout > 0 {
+		ctx, _ := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+		inputs = append(inputs, ctx)
 	}
 
 	// Response var
