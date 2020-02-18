@@ -46,7 +46,10 @@ const (
 /* Private */
 
 func init() {
+	// dont json escape html
 	req.SetJSONEscapeHTML(false)
+	// use timeout from context
+	req.SetTimeout(0)
 }
 
 func getInputsWithTimeout(inputs []interface{}, timeout int) []interface{} {
