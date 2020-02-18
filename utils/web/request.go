@@ -71,6 +71,7 @@ func getInputsWithTimeout(inputs []interface{}, timeout int) []interface{} {
 /* Public */
 
 func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interface{}) (*req.Resp, error) {
+	// prepare request
 	reqInputs := make([]interface{}, 0)
 
 	var rl ratelimit.Limiter = nil
