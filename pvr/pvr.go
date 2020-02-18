@@ -13,8 +13,10 @@ var (
 	pvrDefaultPageSize = 1000
 	pvrDefaultTimeout  = 120
 	pvrDefaultRetry    = web.Retry{
-		MaxAttempts:          5,
-		RetryableStatusCodes: []int{},
+		MaxAttempts: 5,
+		RetryableStatusCodes: []int{
+			504,
+		},
 		Backoff: backoff.Backoff{
 			Jitter: true,
 			Min:    1 * time.Second,
