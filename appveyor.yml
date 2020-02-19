@@ -62,7 +62,7 @@ build_script:
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       docker run --rm --privileged \
-      -v ($pwd):/go/src/github.com/mailchain/mailchain \
+      -v $(pwd):/go/src/github.com/mailchain/mailchain \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -w /go/src/github.com/mailchain/mailchain \
       mailchain/goreleaser-xcgo \
