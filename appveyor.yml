@@ -29,7 +29,7 @@ environment:
     secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
-  - export COMMIT_TIMESTAMP=$(date -d '${APPVEYOR_REPO_COMMIT_TIMESTAMP}' +"%s")
+  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
   - echo $COMMIT_TIMESTAMP
   - which gcc
   - echo $PATH
