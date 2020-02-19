@@ -58,7 +58,7 @@ build_script:
   - make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      CGO=1 equinox release \
+      CGO_ENABLED=1 equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
        --platforms="linux_amd64 darwin_amd64 windows_amd64" \
