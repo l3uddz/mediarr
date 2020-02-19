@@ -65,7 +65,7 @@ build_script:
       -v $(pwd):/go/src/github.com/mailchain/mailchain \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -w /go/src/github.com/mailchain/mailchain \
-      -entrypoint /bin/bash \
+      --entrypoint /bin/bash \
       mailchain/goreleaser-xcgo \
       -c CGO_ENABLED=1 equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
