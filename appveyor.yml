@@ -29,6 +29,9 @@ environment:
     secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
+  - export COMMIT_TIMESTAMP=$(date -d '${APPVEYOR_REPO_COMMIT_TIMESTAMP}' -"%s")
+  - which gcc
+  - echo $PATH
   - go version
   - go env
   - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
@@ -66,7 +69,7 @@ build_script:
        --app="${equinox_app_id}" \
        --token="${equinox_app_token}" \
        -- \
-       -ldflags "-extldflags -static -s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=$(date -d '${APPVEYOR_REPO_COMMIT_TIMESTAMP}' -"%%s")" \
+       -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=${COMMIT_TIMESTAMP}" \
        github.com/l3uddz/mediarr
     fi
 
