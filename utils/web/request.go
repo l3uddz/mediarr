@@ -1,7 +1,6 @@
 package web
 
 import (
-	"context"
 	"go.uber.org/ratelimit"
 	"io/ioutil"
 	"os"
@@ -50,7 +49,7 @@ func init() {
 	// dont json escape html
 	req.SetJSONEscapeHTML(false)
 
-	// use timeout from context
+	// use timeout from getresponse
 	httpClient.Timeout = time.Duration(0)
 }
 
@@ -113,7 +112,7 @@ func GetResponse(method HTTPMethod, requestUrl string, timeout int, v ...interfa
 		// validate response
 		if err != nil {
 			log.WithError(err).Debugf("Failed requesting: %q", requestUrl)
-			if os.IsTimeout(err) || err == context.Canceled {
+			if os.IsTimeout(err) {
 				if retry.MaxAttempts == 0 || retry.Attempt() >= retry.MaxAttempts {
 					return nil, err
 				}
