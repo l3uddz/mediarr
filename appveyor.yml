@@ -61,12 +61,12 @@ build_script:
   - make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-    docker run --rm --privileged \
-    -v ($pwd):/go/src/github.com/mailchain/mailchain \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -w /go/src/github.com/mailchain/mailchain \
-    mailchain/goreleaser-xcgo \
-      CGO_ENABLED=1 $(pwd)/equinox release \
+      docker run --rm --privileged \
+      -v ($pwd):/go/src/github.com/mailchain/mailchain \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -w /go/src/github.com/mailchain/mailchain \
+      mailchain/goreleaser-xcgo \
+      CGO_ENABLED=1 equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
        --platforms="linux_amd64 darwin_amd64 windows_amd64" \
