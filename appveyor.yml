@@ -37,9 +37,9 @@ install:
   - ps: Expand-Archive -Path release-tool-stable-windows-amd64.zip -DestinationPath .
 
 before_build:
-  - cmd: setx COMMIT_TIMESTAMP %EQUINOX_CHANNEL%
-  - cmd: setx EQUINOX_CHANNEL beta
-  - cmd: setx VERSION %APPVEYOR_REPO_TAG_NAME%
+  - cmd: setx COMMIT_TIMESTAMP "%EQUINOX_CHANNEL%" /M
+  - cmd: setx EQUINOX_CHANNEL "beta" /M
+  - cmd: setx VERSION "%APPVEYOR_REPO_TAG_NAME%" /M
 #  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
 #  - echo $COMMIT_TIMESTAMP
 #  - |-
