@@ -48,6 +48,7 @@ install:
   - cmd: appveyor DownloadFile https://dl.google.com/go/go%GOVERSION%.windows-%GETH_ARCH%.zip
   - cmd: 7z x go%GOVERSION%.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
   - cmd: go version
+  - cmd: go env
   - cmd: gcc --version
   # secure-file
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
