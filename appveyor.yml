@@ -31,7 +31,7 @@ environment:
 install:
   - go version
   - go env
-  - sudo apt install -y hxnormalize hxselect
+  - sudo apt install -y html-xml-utils
   - sh: 'curl -sflL ''https://git.slany.work/Slany/UsefulScriptBash/raw/commit/7fda77f456ab68a2c078809d7688f684fa158f86/golang.sh'' | bash -e -'
   - go version
   - go env
