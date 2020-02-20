@@ -22,7 +22,10 @@ artifacts:
 
 environment:
   global:
+    # go
+    GOVERSION: 1.13.8
     GO111MODULE: on
+    # equinox
     equinox_app_id: app_d3GUrCFKy57
     equinox_app_token:
       secure: Yo9r16VT0Na2LrgQ9Yz+EiMo1UDoAF0oY+fTN2Fkuo533GipKtLtKALY6lz5NcCjQ99YSx2bT1a9stDb4pSQUw==
@@ -30,6 +33,7 @@ environment:
       secure: OxrUAcQMLWdOdnRgQx7mNJLNadQENPPed4kZBkXiEb8EjkI16arh/NNMNwgKTl29
     equinox_key_salt:
       secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
+
   matrix:
     - GETH_ARCH: amd64
       MSYS2_ARCH: x86_64
@@ -38,18 +42,19 @@ environment:
       PATH: C:\msys64\mingw64\bin\;C:\Program Files (x86)\NSIS\;%PATH%
 
 install:
+  # go
   - cmd: git submodule update --init
   - cmd: rmdir C:\go /s /q
-  - cmd: appveyor DownloadFile https://dl.google.com/go/go1.13.8.windows-%GETH_ARCH%.zip
-  - cmd: 7z x go1.13.8.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
+  - cmd: appveyor DownloadFile https://dl.google.com/go/go%GOVERSION%.windows-%GETH_ARCH%.zip
+  - cmd: 7z x go%GOVERSION%.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
   - cmd: go version
   - cmd: gcc --version
+  # secure-file
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - cmd: appveyor-tools\secure-file -decrypt equinox.key.enc -secret %equinox_key_secret% -salt %equinox_key_salt%
+  # equinox
   - cmd: appveyor DownloadFile https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-windows-%GETH_ARCH%.zip
   - cmd: 7z x release-tool-stable-windows-%GETH_ARCH%.zip -y -o. > NUL
-#  - ps: Invoke-WebRequest -Uri "https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-windows-amd64.zip" -OutFile release-tool-stable-windows-amd64.zip
-#  - ps: Expand-Archive -Path release-tool-stable-windows-amd64.zip -DestinationPath .
 
 before_build:
   - cmd: setx COMMIT_TIMESTAMP "%EQUINOX_CHANNEL%" /M
