@@ -34,7 +34,7 @@ install:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - cmd: appveyor-tools\secure-file -decrypt equinox.key.enc -secret %equinox_key_secret% -salt %equinox_key_salt%
   - ps: Invoke-WebRequest -Uri "https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-windows-amd64.zip" -OutFile release-tool-stable-windows-amd64.zip
-  - ps: Expand-Archive -Path release-tool-stable-windows-amd64.zip -DestinationPath equinox
+  - ps: Expand-Archive -Path release-tool-stable-windows-amd64.zip -DestinationPath .
   - cmd: dir
   - cmd: dir equinox
 
