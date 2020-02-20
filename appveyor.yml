@@ -19,15 +19,22 @@ artifacts:
     name: mediarr
 
 environment:
-  GO111MODULE: on
-  equinox_app_id: app_d3GUrCFKy57
-  equinox_app_token:
-    secure: Yo9r16VT0Na2LrgQ9Yz+EiMo1UDoAF0oY+fTN2Fkuo533GipKtLtKALY6lz5NcCjQ99YSx2bT1a9stDb4pSQUw==
-  equinox_key_secret:
-    secure: OxrUAcQMLWdOdnRgQx7mNJLNadQENPPed4kZBkXiEb8EjkI16arh/NNMNwgKTl29
-  equinox_key_salt:
-    secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
-
+  global:
+    GO111MODULE: on
+    equinox_app_id: app_d3GUrCFKy57
+    equinox_app_token:
+      secure: Yo9r16VT0Na2LrgQ9Yz+EiMo1UDoAF0oY+fTN2Fkuo533GipKtLtKALY6lz5NcCjQ99YSx2bT1a9stDb4pSQUw==
+    equinox_key_secret:
+      secure: OxrUAcQMLWdOdnRgQx7mNJLNadQENPPed4kZBkXiEb8EjkI16arh/NNMNwgKTl29
+    equinox_key_salt:
+      secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
+  matrix:
+    - GETH_ARCH: amd64
+      MSYS2_ARCH: x86_64
+      MSYS2_BITS: 64
+      MSYSTEM: MINGW64
+      PATH: C:\msys64\mingw64\bin\;C:\Program Files (x86)\NSIS\;%PATH%
+      
 install:
   - go version
   - go env
