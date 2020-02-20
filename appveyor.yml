@@ -42,6 +42,8 @@ environment:
       PATH: C:\msys64\mingw64\bin\;C:\Program Files (x86)\NSIS\;%PATH%
 
 install:
+  # gcc
+  - cmd: gcc --version
   # go
   - cmd: git submodule update --init
   - cmd: rmdir C:\go /s /q
@@ -49,7 +51,6 @@ install:
   - cmd: 7z x go%GOVERSION%.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
   - cmd: go version
   - cmd: go env
-  - cmd: gcc --version
   # secure-file
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - cmd: appveyor-tools\secure-file -decrypt equinox.key.enc -secret %equinox_key_secret% -salt %equinox_key_salt%
