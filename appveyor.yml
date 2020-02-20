@@ -59,7 +59,7 @@ build_script:
   - make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      CGO_ENABLED=1 $(pwd)/equinox release \
+      $(pwd)/equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
        --platforms="linux_amd64 darwin_amd64 windows_amd64" \
