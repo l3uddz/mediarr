@@ -1,7 +1,7 @@
 version: 1.0.{build}
 
 image:
-  - macOS
+  - Visual Studio 2015
 
 platform: x64
 
@@ -31,17 +31,10 @@ environment:
 install:
   - go version
   - go env
-  - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
-  - sh: './appveyor-tools/secure-file -decrypt equinox.key.enc -secret $equinox_key_secret -salt $equinox_key_salt'
-  - sh: 'brew install FiloSottile/musl-cross/musl-cross'
-  - |-
-    if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      case "$OSTYPE" in
-        darwin*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-mac-amd64.zip && unzip release-tool-stable-mac-amd64.zip -d $(pwd) ;;
-        linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip && unzip release-tool-stable-linux-amd64.zip -d $(pwd) ;;
-        *)        echo "unknown: $OSTYPE" ;;
-      esac
-    fi
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
+  - cmd: appveyor-tools\secure-file -decrypt equinox.key.enc -secret %equinox_key_secret% -salt %equinox_key_salt%
+  - ps: (Invoke-WebRequest https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-windows-amd64.zip).Content | Extract-Archive -DestinationPath Get-Location
+  - cmd: dir
 
 before_build:
   - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
