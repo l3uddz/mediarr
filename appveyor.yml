@@ -67,7 +67,7 @@ build_script:
       -w /go/src/github.com/l3uddz/mediarr \
       --entrypoint /bin/bash \
       mailchain/goreleaser-xcgo \
-      -c 'CGO_ENABLED=1 /go/src/github.com/l3uddz/mediarr/equinox release --version="'"${APPVEYOR_REPO_TAG_NAME}"'" --channel="'"${EQUINOX_CHANNEL}"'" --platforms="'"linux_amd64 darwin_amd64 windows_amd64"'" --signing-key=/go/src/github.com/l3uddz/mediarrequinox.key --app="'"${equinox_app_id}"'" --token="'"${equinox_app_token}"'" -- -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version='"${VERSION}"' -X github.com/l3uddz/mediarr/build.GitCommit='"${APPVEYOR_REPO_COMMIT::8}"' -X github.com/l3uddz/mediarr/build.Timestamp='"${COMMIT_TIMESTAMP}"'" github.com/l3uddz/mediarr'
+      -c 'CGO_ENABLED=1 /go/src/github.com/l3uddz/mediarr/equinox release --version="'"${APPVEYOR_REPO_TAG_NAME}"'" --channel="'"${EQUINOX_CHANNEL}"'" --platforms="'"linux_amd64 darwin_amd64 windows_amd64"'" --signing-key=/go/src/github.com/l3uddz/mediarr/equinox.key --app="'"${equinox_app_id}"'" --token="'"${equinox_app_token}"'" -- -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version='"${VERSION}"' -X github.com/l3uddz/mediarr/build.GitCommit='"${APPVEYOR_REPO_COMMIT::8}"' -X github.com/l3uddz/mediarr/build.Timestamp='"${COMMIT_TIMESTAMP}"'" github.com/l3uddz/mediarr'
     fi
 
 after_build:
