@@ -39,7 +39,8 @@ install:
 before_build:
   - cmd: setx COMMIT_TIMESTAMP "%EQUINOX_CHANNEL%" /M
   - cmd: setx EQUINOX_CHANNEL "beta" /M
-  - cmd: setx VERSION "%APPVEYOR_REPO_TAG_NAME%" /M
+#  - cmd: setx VERSION "%APPVEYOR_REPO_TAG_NAME%" /M
+  - cmd: setx VERSION "0.50" /M
 #  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
 #  - echo $COMMIT_TIMESTAMP
 #  - |-
@@ -54,4 +55,4 @@ before_build:
 #    fi
 
 build_script:
-  - cmd: equinox.exe release --version="${APPVEYOR_REPO_TAG_NAME}" --channel="${EQUINOX_CHANNEL}" --platforms="linux_amd64 darwin_amd64 windows_amd64" --signing-key=equinox.key --app="%equinox_app_id%" --token="%equinox_app_token%" -- -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=${COMMIT_TIMESTAMP} -linkmode external -extldflags -static" github.com/l3uddz/mediarr
+  - cmd: equinox.exe release --version="%VERSION%" --channel="%EQUINOX_CHANNEL%" --platforms="linux_amd64 darwin_amd64 windows_amd64" --signing-key=equinox.key --app="%equinox_app_id%" --token="%equinox_app_token%" -- -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=%VERSION% -X github.com/l3uddz/mediarr/build.GitCommit=%APPVEYOR_REPO_COMMIT -X github.com/l3uddz/mediarr/build.Timestamp=%COMMIT_TIMESTAMP% -linkmode external -extldflags -static" github.com/l3uddz/mediarr
