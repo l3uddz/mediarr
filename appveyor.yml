@@ -29,9 +29,9 @@ environment:
     secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
+  - sudo apt install -y mingw-w64 clang-tools-9
   - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
   - echo $COMMIT_TIMESTAMP
-  - apt install -y mingw-w64 clang-tools-9
   - which gcc
   - echo $PATH
   - go version
