@@ -59,8 +59,8 @@ build_script:
       --channel="${EQUINOX_CHANNEL}" \
       --platforms="linux_amd64 darwin_amd64 windows_amd64" \
       --signing-key=equinox.key \
-      --app="${equinox_app_id}" \
-      --token="${equinox_app_token}" \
+      --app="%equinox_app_id%" \
+      --token="%equinox_app_token%" \
       -- \
       -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=${COMMIT_TIMESTAMP} -linkmode external -extldflags -static" \
       github.com/l3uddz/mediarr
