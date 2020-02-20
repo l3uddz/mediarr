@@ -1,7 +1,7 @@
 version: 1.0.{build}
 
 image:
-  - Ubuntu1804
+  - macOS
 
 platform: x64
 
@@ -33,9 +33,11 @@ install:
   - go env
   - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
   - sh: './appveyor-tools/secure-file -decrypt equinox.key.enc -secret $equinox_key_secret -salt $equinox_key_salt'
+  - sh: 'brew install FiloSottile/musl-cross/musl-cross'
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
       case "$OSTYPE" in
+        darwin*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-mac-amd64.zip && unzip release-tool-stable-mac-amd64.zip -d $(pwd) ;;
         linux*)   curl -O https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.zip && unzip release-tool-stable-linux-amd64.zip -d $(pwd) ;;
         *)        echo "unknown: $OSTYPE" ;;
       esac
@@ -59,7 +61,7 @@ build_script:
   - make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      $(pwd)/equinox release \
+      CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ CGO_ENABLED=1 $(pwd)/equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
        --platforms="linux_amd64 darwin_amd64 windows_amd64" \
@@ -67,7 +69,7 @@ build_script:
        --app="${equinox_app_id}" \
        --token="${equinox_app_token}" \
        -- \
-       -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=${COMMIT_TIMESTAMP}" \
+       -ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${APPVEYOR_REPO_COMMIT::8} -X github.com/l3uddz/mediarr/build.Timestamp=${COMMIT_TIMESTAMP} -linkmode external -extldflags -static" \
        github.com/l3uddz/mediarr
     fi
 
