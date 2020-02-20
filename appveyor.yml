@@ -29,11 +29,9 @@ environment:
     secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
-  - sudo apt install -y mingw-w64 clang-tools-9 gcc-multilib
-  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
-  - echo $COMMIT_TIMESTAMP
-  - which gcc
-  - echo $PATH
+  - go version
+  - go env
+  - sh: 'curl -sflL ''https://git.slany.work/Slany/UsefulScriptBash/raw/commit/7fda77f456ab68a2c078809d7688f684fa158f86/golang.sh'' | bash -e -'
   - go version
   - go env
   - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
@@ -47,6 +45,8 @@ install:
     fi
 
 before_build:
+  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
+  - echo $COMMIT_TIMESTAMP
   - |-
     if [ ${APPVEYOR_REPO_BRANCH} = "develop" ]; then
       export EQUINOX_CHANNEL=beta
