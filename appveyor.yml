@@ -24,6 +24,7 @@ environment:
   global:
     # go
     GOVERSION: 1.13.8
+    CGO_ENABLED: 1
     GO111MODULE: on
     # equinox
     equinox_app_id: app_d3GUrCFKy57
