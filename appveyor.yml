@@ -37,9 +37,9 @@ install:
   - ps: Expand-Archive -Path release-tool-stable-windows-amd64.zip -DestinationPath .
 
 before_build:
-  - cmd: set COMMIT_TIMESTAMP=%EQUINOX_CHANNEL%
-  - cmd: set EQUINOX_CHANNEL=beta
-  - cmd: set VERSION=%APPVEYOR_REPO_TAG_NAME%
+  - cmd: setx COMMIT_TIMESTAMP %EQUINOX_CHANNEL%
+  - cmd: setx EQUINOX_CHANNEL beta
+  - cmd: setx VERSION %APPVEYOR_REPO_TAG_NAME%
 #  - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
 #  - echo $COMMIT_TIMESTAMP
 #  - |-
@@ -54,7 +54,7 @@ before_build:
 #    fi
 
 build_script:
-  - cmd: CGO_ENABLED=1 equinox.exe release \
+  - cmd: equinox.exe release \
       --version="${APPVEYOR_REPO_TAG_NAME}" \
       --channel="${EQUINOX_CHANNEL}" \
       --platforms="linux_amd64 darwin_amd64 windows_amd64" \
