@@ -31,10 +31,6 @@ environment:
 install:
   - go version
   - go env
-  - sudo apt install -y html-xml-utils
-  - sh: 'curl -sflL ''https://git.slany.work/Slany/UsefulScriptBash/raw/commit/7fda77f456ab68a2c078809d7688f684fa158f86/golang.sh'' | sudo bash -e -'
-  - go version
-  - go env
   - sh: 'curl -sflL ''https://raw.githubusercontent.com/appveyor/secure-file/master/install.sh'' | bash -e -'
   - sh: './appveyor-tools/secure-file -decrypt equinox.key.enc -secret $equinox_key_secret -salt $equinox_key_salt'
   - |-
