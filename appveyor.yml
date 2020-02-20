@@ -29,7 +29,7 @@ environment:
     secure: SgT7lL3UU7EebphtnUx2dQFTN6Ad9QiGVkCh2B62xMFwW7lyummeb54scTSyHoHTTpAzWpwCJq9hLyHLWiznSg==
 
 install:
-  - sudo apt install -y mingw-w64 clang-tools-9
+  - sudo apt install -y mingw-w64 clang-tools-9 gcc-multilib
   - export COMMIT_TIMESTAMP=$(date -d ${APPVEYOR_REPO_COMMIT_TIMESTAMP} +"%s")
   - echo $COMMIT_TIMESTAMP
   - which gcc
@@ -62,7 +62,7 @@ build_script:
   - make build
   - |-
     if [ ${APPVEYOR_REPO_TAG} = "true" ]; then
-      CGO_ENABLED=1 equinox release \
+      CGO_ENABLED=1 $(pwd)/equinox release \
        --version="${APPVEYOR_REPO_TAG_NAME}" \
        --channel="${EQUINOX_CHANNEL}" \
        --platforms="linux_amd64 darwin_amd64 windows_amd64" \
