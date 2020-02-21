@@ -11,12 +11,12 @@ import (
 var (
 	providerDefaultTimeout = 30
 	providerDefaultRetry   = web.Retry{
-		MaxAttempts:          5,
+		MaxAttempts:          6,
 		RetryableStatusCodes: []int{},
 		Backoff: backoff.Backoff{
 			Jitter: true,
-			Min:    1 * time.Second,
-			Max:    5 * time.Second,
+			Min:    500 * time.Millisecond,
+			Max:    10 * time.Second,
 		},
 	}
 )
