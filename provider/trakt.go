@@ -490,7 +490,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				"canceled",
 				"rumored",
 				"planned",
-				"in production",}, movieItem.Status, true) {
+				"in production"}, movieItem.Status, true) {
 				continue
 			}
 
@@ -527,7 +527,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 				Slug:      movieItem.Ids.Slug,
 				Title:     movieItem.Title,
 				Summary:   movieItem.Overview,
-				Country:   []string{movieItem.Country,},
+				Country:   []string{movieItem.Country},
 				Network:   "",
 				Date:      date,
 				Year:      date.Year(),
@@ -684,7 +684,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			} else if lists.StringListContains([]string{
 				"canceled",
 				"planned",
-				"in production",}, showItem.Status, true) {
+				"in production"}, showItem.Status, true) {
 				continue
 			}
 
@@ -707,7 +707,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 				Slug:      showItem.Ids.Slug,
 				Title:     showItem.Title,
 				Summary:   showItem.Overview,
-				Country:   []string{showItem.Country,},
+				Country:   []string{showItem.Country},
 				Network:   showItem.Network,
 				Date:      showItem.FirstAired,
 				Year:      showItem.FirstAired.Year(),

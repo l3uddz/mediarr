@@ -9,14 +9,14 @@ import (
 )
 
 var (
-	db   *gorm.DB
-	log  = logger.GetLogger("db")
-	json = jsoniter.ConfigCompatibleWithStandardLibrary
+	db         *gorm.DB
+	log        = logger.GetLogger("db")
+	json       = jsoniter.ConfigCompatibleWithStandardLibrary
+	dbFilePath string
 )
 
 func Init(databaseFilePath string) error {
-	// show log
-	log.Infof("Using %s = %q", stringutils.StringLeftJust("DATABASE", " ", 10), databaseFilePath)
+	dbFilePath = databaseFilePath
 
 	// open database
 	if dtb, err := gorm.Open("sqlite3", databaseFilePath); err != nil {
@@ -29,6 +29,16 @@ func Init(databaseFilePath string) error {
 	db.AutoMigrate(&ValidatedProviderItem{}, &ProviderItemMetadata{})
 
 	return nil
+}
+
+func ShowUsing(databaseFilePath *string) {
+	if databaseFilePath != nil {
+		log.Infof("Using %s = %q", stringutils.StringLeftJust("DATABASE", " ", 10),
+			*databaseFilePath)
+		return
+	}
+
+	log.Infof("Using %s = %q", stringutils.StringLeftJust("DATABASE", " ", 10), dbFilePath)
 }
 
 func Close() {

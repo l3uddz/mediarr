@@ -25,6 +25,7 @@ var (
 	// Internal
 	log          = logger.GetLogger("cfg")
 	json         = jsoniter.ConfigCompatibleWithStandardLibrary
+	cfgFilePath  string
 	newOptionLen = 0
 )
 
@@ -37,8 +38,7 @@ func (cfg Configuration) ToJsonString() (string, error) {
 }
 
 func Init(configFilePath string) error {
-	// Info
-	log.Infof("Using %s = %q", stringutils.StringLeftJust("CONFIG", " ", 10), configFilePath)
+	cfgFilePath = configFilePath
 
 	/* Initialize Configuration */
 	viper.SetConfigType("yaml")
@@ -83,6 +83,10 @@ func Init(configFilePath string) error {
 	}
 
 	return nil
+}
+
+func ShowUsing() {
+	log.Infof("Using %s = %q", stringutils.StringLeftJust("CONFIG", " ", 10), cfgFilePath)
 }
 
 /* Private */

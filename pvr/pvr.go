@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	pvrDefaultTimeout  = 120
-	pvrDefaultRetry    = web.Retry{
+	pvrDefaultTimeout = 120
+	pvrDefaultRetry   = web.Retry{
 		MaxAttempts: 6,
 		RetryableStatusCodes: []int{
 			504,

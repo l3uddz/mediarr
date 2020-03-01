@@ -20,6 +20,7 @@ var moviesCmd = &cobra.Command{
 
 		// init core
 		initCore()
+		showUsing()
 
 		// validate core inputs
 		if err := parseValidateInputs(args); err != nil {

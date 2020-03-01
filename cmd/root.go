@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/l3uddz/mediarr/build"
 	"github.com/l3uddz/mediarr/config"
+	"github.com/l3uddz/mediarr/database"
 	"github.com/l3uddz/mediarr/logger"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
@@ -100,15 +101,24 @@ func initCore() {
 
 	log = logger.GetLogger("app")
 
-	log.Infof("Using %s = %s (%s@%s)", stringutils.StringLeftJust("VERSION", " ", 10),
-		build.Version, build.GitCommit, build.Timestamp)
-	logger.ShowUsing()
-
 	// Init Config
 	if err := config.Init(flagConfigFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize config")
 	}
+}
 
+func showUsing() {
+	// version
+	log.Infof("Using %s = %s (%s@%s)", stringutils.StringLeftJust("VERSION", " ", 10),
+		build.Version, build.GitCommit, build.Timestamp)
+	// logging
+	logger.ShowUsing()
+	// config
+	config.ShowUsing()
+	// database
+	database.ShowUsing(&flagDatabaseFile)
+
+	// separator
 	log.Info("------------------")
 }
 

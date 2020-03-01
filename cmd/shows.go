@@ -20,6 +20,7 @@ var showsCmd = &cobra.Command{
 
 		// init core
 		initCore()
+		showUsing()
 
 		// validate inputs
 		if err := parseValidateInputs(args); err != nil {

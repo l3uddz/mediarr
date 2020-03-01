@@ -38,6 +38,7 @@ var updateCmd = &cobra.Command{
 
 		// init core
 		initCore()
+		showUsing()
 
 		// init updater
 		opts := equinox.Options{
