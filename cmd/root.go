@@ -2,6 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/l3uddz/mediarr/build"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/database"
@@ -13,9 +17,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 var (
@@ -30,6 +31,8 @@ var (
 	flagNoFilter   bool
 	flagLimit      int
 
+	flaglistUser string
+	flaglistName string
 	flagQueryStr string
 	flagCountry  string
 	flagLanguage string
