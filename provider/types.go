@@ -20,4 +20,5 @@ const (
 	SearchTypePerson             = "person"
 	SearchTypeQuery              = "query"
 	SearchTypeList               = "list"
+
 )

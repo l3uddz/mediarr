@@ -147,6 +147,7 @@ func NewTrakt() *Trakt {
 			SearchTypePerson,
 			SearchTypeQuery,
 			SearchTypeList,
+
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -159,6 +160,7 @@ func NewTrakt() *Trakt {
 			SearchTypePerson,
 			SearchTypeQuery,
 			SearchTypeList,
+
 		},
 	}
 }
@@ -314,6 +316,7 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		}
 
 		return p.getMovies(fmt.Sprintf("/users/%s/lists/%s/items/movies", listUser, listName), logic, params)
+
 	default:
 		break
 	}
