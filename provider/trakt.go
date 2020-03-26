@@ -146,6 +146,7 @@ func NewTrakt() *Trakt {
 			SearchTypeCollected,
 			SearchTypePerson,
 			SearchTypeQuery,
+			SearchTypeList,
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -157,6 +158,7 @@ func NewTrakt() *Trakt {
 			SearchTypeCollected,
 			SearchTypePerson,
 			SearchTypeQuery,
+			SearchTypeList,
 		},
 	}
 }
@@ -248,6 +250,19 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		}
 
 		return p.getShows(fmt.Sprintf("/search/show?query=&%s", queryStr), logic, params)
+
+	case SearchTypeList:
+		listUser, ok := params["listuser"]
+		if !ok || listUser == "" {
+			return nil, errors.New("List search must have a --listuser string, e.g. enormoz")
+		}
+		listName, ok := params["listname"]
+		if !ok || listName == "" {
+			return nil, errors.New("List search must have a --listname string, e.g. netflix-movies")
+		}
+
+		return p.getShows(fmt.Sprintf("/users/%s/lists/%s/items/shows", listUser, listName), logic, params)
+
 	default:
 		break
 	}
@@ -287,6 +302,18 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		}
 
 		return p.getMovies(fmt.Sprintf("/search/movie?query=&%s", queryStr), logic, params)
+
+	case SearchTypeList:
+		listUser, ok := params["listuser"]
+		if !ok || listUser == "" {
+			return nil, errors.New("List search must have a --listuser string, e.g. enormoz")
+		}
+		listName, ok := params["listname"]
+		if !ok || listName == "" {
+			return nil, errors.New("List search must have a --listname string, e.g. netflix-movies")
+		}
+
+		return p.getMovies(fmt.Sprintf("/users/%s/lists/%s/items/movies", listUser, listName), logic, params)
 	default:
 		break
 	}

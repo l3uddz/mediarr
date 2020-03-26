@@ -19,4 +19,5 @@ const (
 	SearchTypeCollected          = "collected"
 	SearchTypePerson             = "person"
 	SearchTypeQuery              = "query"
+	SearchTypeList               = "list"
 )

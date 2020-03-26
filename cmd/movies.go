@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/l3uddz/mediarr/database"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 var moviesCmd = &cobra.Command{
@@ -70,8 +71,9 @@ var moviesCmd = &cobra.Command{
 			"genre":    flagGenre,
 			"year":     flagYear,
 			"rating":   flagRating,
-
-			"query": flagQueryStr,
+			"query":    flagQueryStr,
+			"listname": flaglistName,
+			"listuser": flaglistUser,
 		}
 
 		// retrieve media
@@ -118,6 +120,8 @@ func init() {
 	moviesCmd.Flags().BoolVar(&flagNoFilter, "no-filter", false, "No filter expression checking.")
 	moviesCmd.Flags().IntVar(&flagLimit, "limit", 0, "Max accepted items to add.")
 
+	moviesCmd.Flags().StringVar(&flaglistUser, "listuser", "", "Username the list belongs to")
+	moviesCmd.Flags().StringVar(&flaglistName, "listname", "", "Name of the list. The one you see in the url.")
 	moviesCmd.Flags().StringVar(&flagQueryStr, "query", "", "Query for search.")
 	moviesCmd.Flags().StringVar(&flagCountry, "country", "", "Countries to filter results.")
 	moviesCmd.Flags().StringVar(&flagLanguage, "language", "", "Languages to filter results.")
