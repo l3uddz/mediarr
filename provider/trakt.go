@@ -2,6 +2,10 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
@@ -11,9 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/ratelimit"
-	"strconv"
-	"strings"
-	"time"
 )
 
 /* Const */
@@ -144,6 +145,7 @@ func NewTrakt() *Trakt {
 			SearchTypePlayed,
 			SearchTypeCollected,
 			SearchTypePerson,
+			SearchTypeQuery,
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -154,6 +156,7 @@ func NewTrakt() *Trakt {
 			SearchTypePlayed,
 			SearchTypeCollected,
 			SearchTypePerson,
+			SearchTypeQuery,
 		},
 	}
 }
@@ -238,6 +241,13 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 		}
 
 		return p.getShows(fmt.Sprintf("/people/%s/shows", queryStr), logic, params)
+	case SearchTypeQuery:
+		queryStr, ok := params["query"]
+		if !ok || queryStr == "" {
+			return nil, errors.New("Query search must have a --query string, e.g. imdb_ratings=5.0-10")
+		}
+
+		return p.getShows(fmt.Sprintf("/search/show?query=&%s", queryStr), logic, params)
 	default:
 		break
 	}
@@ -270,6 +280,13 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 		}
 
 		return p.getMovies(fmt.Sprintf("/people/%s/movies", queryStr), logic, params)
+	case SearchTypeQuery:
+		queryStr, ok := params["query"]
+		if !ok || queryStr == "" {
+			return nil, errors.New("Query search must have a --query string, e.g. imdb_ratings=5.0-10")
+		}
+
+		return p.getMovies(fmt.Sprintf("/search/movie?query=&%s", queryStr), logic, params)
 	default:
 		break
 	}

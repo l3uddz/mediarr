@@ -18,4 +18,5 @@ const (
 	SearchTypePlayed             = "played"
 	SearchTypeCollected          = "collected"
 	SearchTypePerson             = "person"
+	SearchTypeQuery              = "query"
 )
