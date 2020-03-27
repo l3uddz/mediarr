@@ -3,7 +3,7 @@ module github.com/l3uddz/mediarr
 go 1.13
 
 require (
-	github.com/antonmedv/expr v1.8.0
+	github.com/antonmedv/expr v1.8.2
 	github.com/equinox-io/equinox v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
@@ -15,6 +15,7 @@ require (
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
+	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
@@ -25,18 +26,18 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
-	github.com/spf13/cobra v0.0.6
+	github.com/spf13/cobra v0.0.7
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/ratelimit v0.1.0
-	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
+	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59 // indirect
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0 // indirect
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/ini.v1 v1.54.0 // indirect
+	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

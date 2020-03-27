@@ -10,11 +10,7 @@ func ExistsValidatedProviderItem(provider string, itemId string) bool {
 
 	// does item already exist?
 	err := db.First(&existingItem, "provider = ? AND id = ?", provider, itemId).Error
-	if gorm.IsRecordNotFoundError(err) {
-		return false
-	}
-
-	return true
+	return gorm.IsRecordNotFoundError(err)
 }
 
 func AddValidatedProviderItem(provider string, itemId string) error {

@@ -293,7 +293,7 @@ func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	}
 
 	// parse response
-	existingMediaItems := make(map[string]config.MediaItem, 0)
+	existingMediaItems := make(map[string]config.MediaItem)
 	itemsSize := 0
 
 	for _, item := range s {

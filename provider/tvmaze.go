@@ -219,7 +219,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 	}
 
 	// process response
-	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItems := make(map[string]config.MediaItem)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
 	existingItemsSize := 0

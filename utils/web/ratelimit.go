@@ -19,7 +19,7 @@ func GetRateLimiter(name string, newRateLimit int) *ratelimit.Limiter {
 
 	// init map
 	if rateLimiters == nil {
-		rateLimiters = make(map[string]ratelimit.Limiter, 0)
+		rateLimiters = make(map[string]ratelimit.Limiter)
 		log.Trace("Initialized rateLimiters map")
 	}
 

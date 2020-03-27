@@ -42,7 +42,7 @@ const (
 	TraktClientId string = "7eb1023eff72ac4d130e1fb46ae2741fe0f5fd39c367b74c8f37285e09aff23d"
 
 	Tmdb TraktSearchType = "tmdb"
-	Tvdb                 = "tvdb"
+	Tvdb TraktSearchType = "tvdb"
 )
 
 func LookupTraktId(mediaType string, providerType TraktSearchType, searchId string) (int, error) {

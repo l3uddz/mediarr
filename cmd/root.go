@@ -46,10 +46,9 @@ var (
 	// Global vars
 	log *logrus.Entry
 
-	pvrName      string
-	lowerPvrName string
-	pvrConfig    *config.Pvr
-	pvr          pvrObj.Interface
+	pvrName   string
+	pvrConfig *config.Pvr
+	pvr       pvrObj.Interface
 
 	existingMediaItems map[string]config.MediaItem
 
@@ -128,8 +127,8 @@ func showUsing() {
 /* Private Helpers */
 
 func parseValidateInputs(args []string) error {
-	var ok bool = false
-	var err error = nil
+	var ok bool
+	var err error
 
 	// validate cli flags
 	if flagSearchType == "person" && flagQueryStr == "" {
@@ -138,7 +137,6 @@ func parseValidateInputs(args []string) error {
 
 	// validate pvr exists in config
 	pvrName = args[0]
-	lowerPvrName = strings.ToLower(pvrName)
 
 	pvrConfig, ok = config.Config.Pvr[pvrName]
 	if !ok {
@@ -178,7 +176,7 @@ func shouldAcceptMediaItem(mediaItem *config.MediaItem) bool {
 	}
 
 	if ignore, err := pvr.ShouldIgnore(mediaItem); err != nil {
-		log.WithError(err).Error("Failed evaluating ignore expressions against: %+v", mediaItem)
+		log.WithError(err).Errorf("Failed evaluating ignore expressions against: %+v", mediaItem)
 		return false
 	} else if ignore {
 		return false

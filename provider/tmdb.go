@@ -1,11 +1,9 @@
 package provider
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
-	"github.com/l3uddz/mediarr/database"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/web"
@@ -125,7 +123,7 @@ func NewTmdb() *Tmdb {
 		apiKey:  "",
 		timeout: providerDefaultTimeout,
 
-		genres: make(map[int]string, 0),
+		genres: make(map[int]string),
 
 		supportedShowsSearchTypes: []string{},
 		supportedMoviesSearchTypes: []string{
@@ -279,50 +277,51 @@ func (p *Tmdb) loadGenres() error {
 	return nil
 }
 
-func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error) {
-	// check database for this item
-	existingItemJson, err := database.GetMetadataItem("tmdb", tmdbId)
-	if err == nil && existingItemJson != nil {
-		// item was found in database, unmarshal
-		var n TmdbMovieDetailsResponse
-		if err := json.Unmarshal([]byte(*existingItemJson), &n); err != nil {
-			p.log.WithError(err).Errorf("Failed decoding metadata stored in database for tmdb id: %q", tmdbId)
-		} else {
-			return &n, nil
-		}
-	}
-
-	// set request params
-	params := req.Param{
-		"api_key": p.apiKey,
-	}
-
-	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), p.timeout, params,
-		&providerDefaultTimeout, p.reqRatelimit)
-	if err != nil {
-		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
-	}
-	defer resp.Response().Body.Close()
-
-	// validate response
-	if resp.Response().StatusCode != 200 {
-		return nil, fmt.Errorf("failed retrieving valid movie details api response: %s", resp.Response().Status)
-	}
-
-	// decode response
-	var s TmdbMovieDetailsResponse
-	if err := resp.ToJSON(&s); err != nil {
-		return nil, errors.WithMessage(err, "failed decoding movie details api response")
-	}
-
-	// add item to database
-	if err := database.AddMetadataItem("tmdb", tmdbId, s); err != nil {
-		logrus.WithError(err).Errorf("Failed adding metadata item to database for tmdb id: %q", tmdbId)
-	}
-
-	return &s, nil
-}
+//
+//func (p *Tmdb) getMovieDetails(tmdbId string) (*TmdbMovieDetailsResponse, error) {
+//	// check database for this item
+//	existingItemJson, err := database.GetMetadataItem("tmdb", tmdbId)
+//	if err == nil && existingItemJson != nil {
+//		// item was found in database, unmarshal
+//		var n TmdbMovieDetailsResponse
+//		if err := json.Unmarshal([]byte(*existingItemJson), &n); err != nil {
+//			p.log.WithError(err).Errorf("Failed decoding metadata stored in database for tmdb id: %q", tmdbId)
+//		} else {
+//			return &n, nil
+//		}
+//	}
+//
+//	// set request params
+//	params := req.Param{
+//		"api_key": p.apiKey,
+//	}
+//
+//	// send request
+//	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), p.timeout, params,
+//		&providerDefaultTimeout, p.reqRatelimit)
+//	if err != nil {
+//		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
+//	}
+//	defer resp.Response().Body.Close()
+//
+//	// validate response
+//	if resp.Response().StatusCode != 200 {
+//		return nil, fmt.Errorf("failed retrieving valid movie details api response: %s", resp.Response().Status)
+//	}
+//
+//	// decode response
+//	var s TmdbMovieDetailsResponse
+//	if err := resp.ToJSON(&s); err != nil {
+//		return nil, errors.WithMessage(err, "failed decoding movie details api response")
+//	}
+//
+//	// add item to database
+//	if err := database.AddMetadataItem("tmdb", tmdbId, s); err != nil {
+//		logrus.WithError(err).Errorf("Failed adding metadata item to database for tmdb id: %q", tmdbId)
+//	}
+//
+//	return &s, nil
+//}
 
 func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
 	// set request params
@@ -339,7 +338,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 	}
 
 	// fetch all page results
-	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItems := make(map[string]config.MediaItem)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
 	existingItemsSize := 0

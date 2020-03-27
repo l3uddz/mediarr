@@ -132,10 +132,10 @@ func NewTrakt() *Trakt {
 		fnAcceptMediaItem: nil,
 
 		apiUrl:     "https://api.trakt.tv",
-		apiHeaders: make(req.Header, 0),
+		apiHeaders: make(req.Header),
 		timeout:    providerDefaultTimeout,
 
-		genres: make(map[int]string, 0),
+		genres: make(map[int]string),
 
 		supportedShowsSearchTypes: []string{
 			SearchTypePopular,
@@ -147,7 +147,6 @@ func NewTrakt() *Trakt {
 			SearchTypePerson,
 			SearchTypeQuery,
 			SearchTypeList,
-
 		},
 		supportedMoviesSearchTypes: []string{
 			SearchTypeTrending,
@@ -160,7 +159,6 @@ func NewTrakt() *Trakt {
 			SearchTypePerson,
 			SearchTypeQuery,
 			SearchTypeList,
-
 		},
 	}
 }
@@ -248,7 +246,7 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 	case SearchTypeQuery:
 		queryStr, ok := params["query"]
 		if !ok || queryStr == "" {
-			return nil, errors.New("Query search must have a --query string, e.g. imdb_ratings=5.0-10")
+			return nil, errors.New("query search must have a --query string, e.g. imdb_ratings=5.0-10")
 		}
 
 		return p.getShows(fmt.Sprintf("/search/show?query=&%s", queryStr), logic, params)
@@ -256,11 +254,11 @@ func (p *Trakt) GetShows(searchType string, logic map[string]interface{}, params
 	case SearchTypeList:
 		listUser, ok := params["listuser"]
 		if !ok || listUser == "" {
-			return nil, errors.New("List search must have a --listuser string, e.g. enormoz")
+			return nil, errors.New("list search must have a --listuser string, e.g. enormoz")
 		}
 		listName, ok := params["listname"]
 		if !ok || listName == "" {
-			return nil, errors.New("List search must have a --listname string, e.g. netflix-movies")
+			return nil, errors.New("list search must have a --listname string, e.g. netflix-movies")
 		}
 
 		return p.getShows(fmt.Sprintf("/users/%s/lists/%s/items/shows", listUser, listName), logic, params)
@@ -300,7 +298,7 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 	case SearchTypeQuery:
 		queryStr, ok := params["query"]
 		if !ok || queryStr == "" {
-			return nil, errors.New("Query search must have a --query string, e.g. imdb_ratings=5.0-10")
+			return nil, errors.New("query search must have a --query string, e.g. imdb_ratings=5.0-10")
 		}
 
 		return p.getMovies(fmt.Sprintf("/search/movie?query=&%s", queryStr), logic, params)
@@ -308,11 +306,11 @@ func (p *Trakt) GetMovies(searchType string, logic map[string]interface{}, param
 	case SearchTypeList:
 		listUser, ok := params["listuser"]
 		if !ok || listUser == "" {
-			return nil, errors.New("List search must have a --listuser string, e.g. enormoz")
+			return nil, errors.New("list search must have a --listuser string, e.g. enormoz")
 		}
 		listName, ok := params["listname"]
 		if !ok || listName == "" {
-			return nil, errors.New("List search must have a --listname string, e.g. netflix-movies")
+			return nil, errors.New("list search must have a --listname string, e.g. netflix-movies")
 		}
 
 		return p.getMovies(fmt.Sprintf("/users/%s/lists/%s/items/movies", listUser, listName), logic, params)
@@ -469,7 +467,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 	}
 
 	// fetch all page results
-	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItems := make(map[string]config.MediaItem)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
 	existingItemsSize := 0
@@ -664,7 +662,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 	}
 
 	// fetch all page results
-	mediaItems := make(map[string]config.MediaItem, 0)
+	mediaItems := make(map[string]config.MediaItem)
 	mediaItemsSize := 0
 	ignoredItemsSize := 0
 	existingItemsSize := 0
