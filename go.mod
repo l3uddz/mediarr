@@ -3,7 +3,7 @@ module github.com/l3uddz/mediarr
 go 1.13
 
 require (
-	github.com/antonmedv/expr v1.8.0
+	github.com/antonmedv/expr v1.8.2
 	github.com/equinox-io/equinox v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
