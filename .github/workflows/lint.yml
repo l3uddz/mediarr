@@ -1,0 +1,10 @@
+name: GolangCI-Lint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run GolangCI-Lint
+      uses: docker://matoous/golangci-lint-action:v1.1.0
