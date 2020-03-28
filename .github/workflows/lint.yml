@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   lint:
-  - uses: actions/checkout@v2
-  - name: Run golangci-lint
-    uses: actions-contrib/golangci-lint@v1
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run golangci-lint
+      uses: actions-contrib/golangci-lint@v1
