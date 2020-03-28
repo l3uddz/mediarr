@@ -7,25 +7,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # dependencies
-      - name: Install dependencies
+      - name: dependencies
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b /usr/local/bin v1.24.0
 
       # checkout
-      - name: Checkout repository
+      - name: checkout
         uses: actions/checkout@v2
 
       # lint
-      - name: Run lint
+      - name: lint
         run: |
           make lint
 
       # test
-      - name: Run tests
+      - name: test
         run: |
           make test
 
+      # cache
+      - name: cache
+        uses: actions/cache@v1
+        with:
+          path: $(pwd)/vendor
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # vendor
+      - name: vendor
+        run: |
+          make vendor
+
       # build
-      - name: Run build
+      - name: build
         run: |
           make build
