@@ -1,0 +1,20 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.24.0
+
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run golangci-lint
+        run: |
+          make lint
