@@ -25,7 +25,7 @@ var updateCmd = &cobra.Command{
 		}
 
 		// detect latest version
-		log.Infof("Checking for latest version...")
+		log.Info("Checking for the latest version...")
 		latest, found, err := selfupdate.DetectLatest("l3uddz/mediarr")
 		if err != nil {
 			log.WithError(err).Fatal("Failed determining latest available version")
@@ -38,7 +38,7 @@ var updateCmd = &cobra.Command{
 		}
 
 		// ask update
-		log.Infof("Do you want to update to the latest version: %v?", latest.Version)
+		log.Infof("Do you want to update to the latest version: %v? (y/n):", latest.Version)
 		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil || (input != "y\n" && input != "n\n") {
 			log.Fatal("Failed validating input...")
@@ -53,7 +53,7 @@ var updateCmd = &cobra.Command{
 		}
 
 		if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
-			log.WithError(err).Fatal("Failed updating binary to latest release")
+			log.WithError(err).Fatal("Failed updating existing binary to latest release")
 		}
 
 		log.Infof("Successfully updated to the latest version: %v", latest.Version)

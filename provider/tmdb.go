@@ -463,7 +463,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			"pages":    s.TotalPages,
 			"accepted": mediaItemsSize,
 			"ignored":  ignoredItemsSize,
-			"exisitng": existingItemsSize,
+			"existing": existingItemsSize,
 		}).Info("Retrieved")
 
 		// loop logic
