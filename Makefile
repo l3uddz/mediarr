@@ -12,7 +12,7 @@ GIT_COMMIT     := $(shell git rev-parse --short HEAD)
 # GIT_BRANCH     := $(shell git symbolic-ref --short HEAD)
 TIMESTAMP      := $(shell date +%s)
 VERSION        ?= 0.0.0-dev
-TAG_VERSION	   := ${GITHUB_REF/refs\/tags\//v}
+TAG_VERSION	   := ${GITHUB_REF:12}
 CGO			   := 1
 
 # Deps
