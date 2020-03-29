@@ -12,7 +12,6 @@ GIT_COMMIT     := $(shell git rev-parse --short HEAD)
 # GIT_BRANCH     := $(shell git symbolic-ref --short HEAD)
 TIMESTAMP      := $(shell date +%s)
 VERSION        ?= 0.0.0-dev
-TAG_VERSION	   := ${GITHUB_REF:12}
 CGO			   := 1
 
 # Deps
@@ -87,7 +86,7 @@ release: fetch ## Generate a release, but don't publish
 publish: fetch ## Generate a release, and publish
 		docker run --rm --privileged \
 			-e GITHUB_TOKEN="${TOKEN}" \
-			-e VERSION="${TAG_VERSION}" \
+			-e VERSION="${GIT_TAG_NAME}" \
 			-e GIT_COMMIT="${GIT_COMMIT}" \
 			-e TIMESTAMP="${TIMESTAMP}" \
             -v `pwd`:/go/src/github.com/l3uddz/mediarr \
