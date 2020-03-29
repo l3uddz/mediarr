@@ -15,6 +15,16 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
+      # unshallow (for goreleaser)
+      - name: unshallow
+        run: git fetch --prune --unshallow
+
+      # setup go
+      - name: go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14.1
+
       # lint
       - name: lint
         run: |
@@ -42,4 +52,11 @@ jobs:
       # build
       - name: build
         run: |
-          make build
+          make snapshot
+
+      # artifact
+      - name: artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: build_${GITHUB_SHA}
+          path: dist/

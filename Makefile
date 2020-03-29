@@ -12,14 +12,12 @@ GIT_COMMIT     := $(shell git rev-parse --short HEAD)
 # GIT_BRANCH     := $(shell git symbolic-ref --short HEAD)
 TIMESTAMP      := $(shell date +%s)
 VERSION        ?= 0.0.0-dev
+CGO			   := 1
 
 # Deps
 .PHONY: check_golangci
 check_golangci:
 	@command -v golangci-lint >/dev/null || (echo "golangci-lint is required."; exit 1)
-.PHONY: check_goreleaser
-check_goreleaser:
-	@command -v goreleaser >/dev/null || (echo "goreleaser is required."; exit 1)
 
 .PHONY: all ## Run tests, linting and build
 all: test lint build
@@ -54,7 +52,7 @@ build: fetch ${BUILD_PATH}/${CMD} ## Build application
 ${BUILD_PATH}/${CMD}: ${GO_FILES} go.sum
 	@echo "Building for ${TARGET}..." && \
 	mkdir -p ${BUILD_PATH} && \
-	CGO_ENABLED=1 go build \
+	CGO_ENABLED=${CGO} go build \
 		-mod vendor \
 		-trimpath \
 		-ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${GIT_COMMIT} -X github.com/l3uddz/mediarr/build.Timestamp=${TIMESTAMP}" \
@@ -74,16 +72,28 @@ fetch: ## Fetch vendor files
 	go mod vendor
 
 .PHONY: release
-release: check_goreleaser fetch ## Generate a release, but don't publish
-	goreleaser --skip-validate --skip-publish --rm-dist
+release: fetch ## Generate a release, but don't publish
+		docker run --rm --privileged \
+            -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -w /go/src/github.com/l3uddz/mediarr \
+            neilotoole/xcgo:latest goreleaser --skip-validate --skip-publish --rm-dist
 
 .PHONY: publish
-publish: check_goreleaser fetch ## Generate a release, and publish
-	goreleaser --rm-dist
+publish: fetch ## Generate a release, and publish
+		docker run --rm --privileged \
+            -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -w /go/src/github.com/l3uddz/mediarr \
+            neilotoole/xcgo:latest goreleaser --rm-dist
 
 .PHONY: snapshot
-snapshot: check_goreleaser fetch ## Generate a snapshot release
-	goreleaser --snapshot --skip-validate --skip-publish --rm-dist
+snapshot: fetch ## Generate a snapshot release
+	docker run --rm --privileged \
+        -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -w /go/src/github.com/l3uddz/mediarr \
+        neilotoole/xcgo:latest goreleaser --snapshot --skip-validate --skip-publish --rm-dist
 
 .PHONY: help
 help:
