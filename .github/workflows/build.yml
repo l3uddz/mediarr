@@ -5,6 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    shell: bash
     steps:
       # dependencies
       - name: dependencies
@@ -51,8 +52,15 @@ jobs:
 
       # build
       - name: build
+        if: !startsWith(github.ref, 'refs/tags/')
         run: |
           make snapshot
+
+      # publish
+      - name: publish
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          make publish
 
       # artifacts
       - name: artifact_linux
