@@ -1,14 +1,52 @@
 # https://goreleaser.com
 project_name: mediarr
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=1
 
 # Build
 builds:
-  -
+  - id: build_macos
     env:
-      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
+    main: ./main.go
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    ldflags:
+      - -s -w
+      - -X "github.com/l3uddz/mediarr/build.Version={{ .Version }}"
+      - -X "github.com/l3uddz/mediarr/build.GitCommit={{ .ShortCommit }}"
+      - -X "github.com/l3uddz/mediarr/build.Timestamp={{ .Timestamp }}"
+    flags:
+      - -trimpath
+
+  - id: build_linux
+    main: ./main.go
     goos:
       - linux
-      - darwin
+    goarch:
+      - amd64
+    ldflags:
+      - -linkmode external
+      - -extldflags -static
+      - -s -w
+      - -X "github.com/l3uddz/mediarr/build.Version={{ .Version }}"
+      - -X "github.com/l3uddz/mediarr/build.GitCommit={{ .ShortCommit }}"
+      - -X "github.com/l3uddz/mediarr/build.Timestamp={{ .Timestamp }}"
+    flags:
+      - -trimpath
+      - -tags=netgo
+      - -v
+
+  - id: build_windows
+    env:
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    main: ./main.go
+    goos:
       - windows
     goarch:
       - amd64
@@ -23,8 +61,12 @@ builds:
 # Archive
 archives:
   -
+    builds: ['build_macos', 'build_linux', 'build_windows']
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format: "tar.gz"
+    format_overrides:
+      - goos: windows
+        format: zip
 
 # Checksum
 checksum:
