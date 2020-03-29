@@ -74,7 +74,7 @@ fetch: ## Fetch vendor files
 .PHONY: release
 release: fetch ## Generate a release, but don't publish
 		docker run --rm --privileged \
-            -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+            -v `pwd`:/go/src/github.com/l3uddz/mediarr \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -w /go/src/github.com/l3uddz/mediarr \
             neilotoole/xcgo:latest goreleaser --skip-validate --skip-publish --rm-dist
@@ -82,7 +82,7 @@ release: fetch ## Generate a release, but don't publish
 .PHONY: publish
 publish: fetch ## Generate a release, and publish
 		docker run --rm --privileged \
-            -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+            -v `pwd`:/go/src/github.com/l3uddz/mediarr \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -w /go/src/github.com/l3uddz/mediarr \
             neilotoole/xcgo:latest goreleaser --rm-dist
@@ -90,7 +90,7 @@ publish: fetch ## Generate a release, and publish
 .PHONY: snapshot
 snapshot: fetch ## Generate a snapshot release
 	docker run --rm --privileged \
-        -v $(pwd):/go/src/github.com/l3uddz/mediarr \
+        -v `pwd`:/go/src/github.com/l3uddz/mediarr \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -w /go/src/github.com/l3uddz/mediarr \
         neilotoole/xcgo:latest goreleaser --snapshot --skip-validate --skip-publish --rm-dist
