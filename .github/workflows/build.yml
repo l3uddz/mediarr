@@ -59,16 +59,16 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_linux
-          path: dist/**linux**.tar.tgz
+          path: dist/*linux*.tar.tgz
 
       - name: artifact_darwin
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_darwin
-          path: dist/**darwin**.tar.tgz
+          path: dist/*darwin*.tar.tgz
 
       - name: artifact_windows
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_windows
-          path: dist/**windows**.tar.tgz
+          path: dist/*windows*.zip
