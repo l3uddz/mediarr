@@ -58,17 +58,17 @@ jobs:
       - name: artifact_linux
         uses: actions/upload-artifact@v2-preview
         with:
-          name: build_linux_${{GITHUB_SHA}}
+          name: build_linux
           path: dist/**linux**.tar.tgz
 
       - name: artifact_darwin
         uses: actions/upload-artifact@v2-preview
         with:
-          name: build_darwin_${{GITHUB_SHA}}
+          name: build_darwin
           path: dist/**darwin**.tar.tgz
 
       - name: artifact_windows
         uses: actions/upload-artifact@v2-preview
         with:
-          name: build_windows_${{GITHUB_SHA}}
+          name: build_windows
           path: dist/**windows**.tar.tgz
