@@ -85,7 +85,7 @@ release: fetch ## Generate a release, but don't publish
 .PHONY: publish
 publish: fetch ## Generate a release, and publish
 		docker run --rm --privileged \
-			-e GITHUB_TOKEN="$GITHUB_TOKEN" \
+			-e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
 			-e VERSION="${VERSION}" \
 			-e GIT_COMMIT="${GIT_COMMIT}" \
 			-e TIMESTAMP="${TIMESTAMP}" \
