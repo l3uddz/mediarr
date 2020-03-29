@@ -31,9 +31,9 @@ jobs:
           make lint
 
       # test
-      - name: test
-        run: |
-          make test
+      #- name: test
+      #  run: |
+      #    make test
 
       # cache
       - name: cache
