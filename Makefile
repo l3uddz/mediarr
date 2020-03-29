@@ -74,6 +74,9 @@ fetch: ## Fetch vendor files
 .PHONY: release
 release: fetch ## Generate a release, but don't publish
 		docker run --rm --privileged \
+			-e VERSION="${VERSION}" \
+			-e GIT_COMMIT="${GIT_COMMIT}" \
+			-e TIMESTAMP="${TIMESTAMP}" \
             -v `pwd`:/go/src/github.com/l3uddz/mediarr \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -w /go/src/github.com/l3uddz/mediarr \
@@ -82,6 +85,9 @@ release: fetch ## Generate a release, but don't publish
 .PHONY: publish
 publish: fetch ## Generate a release, and publish
 		docker run --rm --privileged \
+			-e VERSION="${VERSION}" \
+			-e GIT_COMMIT="${GIT_COMMIT}" \
+			-e TIMESTAMP="${TIMESTAMP}" \
             -v `pwd`:/go/src/github.com/l3uddz/mediarr \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -w /go/src/github.com/l3uddz/mediarr \
@@ -90,6 +96,9 @@ publish: fetch ## Generate a release, and publish
 .PHONY: snapshot
 snapshot: fetch ## Generate a snapshot release
 	docker run --rm --privileged \
+		-e VERSION="${VERSION}" \
+		-e GIT_COMMIT="${GIT_COMMIT}" \
+		-e TIMESTAMP="${TIMESTAMP}" \
         -v `pwd`:/go/src/github.com/l3uddz/mediarr \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -w /go/src/github.com/l3uddz/mediarr \

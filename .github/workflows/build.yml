@@ -54,9 +54,21 @@ jobs:
         run: |
           make snapshot
 
-      # artifact
-      - name: artifact
-        uses: actions/upload-artifact@v1
+      # artifacts
+      - name: artifact_linux
+        uses: actions/upload-artifact@v2-preview
         with:
-          name: build_${GITHUB_SHA}
-          path: dist/
+          name: build_linux_${{GITHUB_SHA}}
+          path: dist/**linux**.tar.tgz
+
+      - name: artifact_darwin
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: build_darwin_${{GITHUB_SHA}}
+          path: dist/**darwin**.tar.tgz
+
+      - name: artifact_windows
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: build_windows_${{GITHUB_SHA}}
+          path: dist/**windows**.tar.tgz
