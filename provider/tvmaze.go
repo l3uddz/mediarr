@@ -198,7 +198,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed retrieving full schedule api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {

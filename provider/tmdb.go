@@ -255,7 +255,7 @@ func (p *Tmdb) loadGenres() error {
 	if err != nil {
 		return errors.WithMessage(err, "failed retrieving genres api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {
@@ -302,7 +302,7 @@ func (p *Tmdb) loadGenres() error {
 //	if err != nil {
 //		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
 //	}
-//	defer resp.Response().Body.Close()
+//	defer web.DrainAndClose(resp.Response().Body)
 //
 //	// validate response
 //	if resp.Response().StatusCode != 200 {
@@ -358,18 +358,18 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 
 		// validate response
 		if resp.Response().StatusCode != 200 {
-			_ = resp.Response().Body.Close()
+			web.DrainAndClose(resp.Response().Body)
 			return nil, fmt.Errorf("failed retrieving valid movies api response: %s", resp.Response().Status)
 		}
 
 		// decode response
 		var s TmdbMoviesResponse
 		if err := resp.ToJSON(&s); err != nil {
-			_ = resp.Response().Body.Close()
+			web.DrainAndClose(resp.Response().Body)
 			return nil, errors.WithMessage(err, "failed decoding movies api response")
 		}
 
-		_ = resp.Response().Body.Close()
+		web.DrainAndClose(resp.Response().Body)
 
 		// process response
 		for _, item := range s.Results {

@@ -68,7 +68,7 @@ func LookupTraktId(mediaType string, providerType TraktSearchType, searchId stri
 	if err != nil {
 		return 0, errors.WithMessagef(err, "failed retrieving trakt %s search response for: %q", mediaType, searchId)
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {

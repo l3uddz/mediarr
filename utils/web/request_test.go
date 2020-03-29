@@ -14,7 +14,7 @@ func TestGetResponseTimeout(t *testing.T) {
 		t.Errorf("Expected timeout in 3 seconds but got error: %v", err)
 		return
 	} else if err == nil {
-		defer resp.Response().Body.Close()
+		defer DrainAndClose(resp.Response().Body)
 		t.Errorf("Expected timeout in 3 seconds but got no error...")
 	}
 }

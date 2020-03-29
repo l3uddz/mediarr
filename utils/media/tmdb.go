@@ -20,7 +20,7 @@ func ValidateTmdbId(idType string, tmdbId string) bool {
 		log.WithError(err).Tracef("Failed retrieving tmdb details for: %q", tmdbId)
 		return false
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {

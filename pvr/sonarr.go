@@ -99,7 +99,7 @@ func (p *Sonarr) getSystemStatus() (*SonarrSystemStatus, error) {
 	if err != nil {
 		return nil, errors.New("failed retrieving system status api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {
@@ -205,7 +205,7 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	if err != nil {
 		return 0, errors.New("failed retrieving quality profiles api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {
@@ -262,7 +262,7 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 	if err != nil {
 		return errors.New("failed retrieving add series api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 && resp.Response().StatusCode != 201 {
@@ -279,7 +279,7 @@ func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	if err != nil {
 		return nil, errors.New("failed retrieving series api response")
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {

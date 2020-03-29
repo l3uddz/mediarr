@@ -25,7 +25,7 @@ func ValidateTvdbId(tvdbId string) bool {
 		log.WithError(err).Tracef("Failed retrieving tvdb details for: %q", tvdbId)
 		return false
 	}
-	defer resp.Response().Body.Close()
+	defer web.DrainAndClose(resp.Response().Body)
 
 	// validate response
 	if resp.Response().StatusCode != 200 {

@@ -487,7 +487,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 
 		// validate response
 		if resp.Response().StatusCode != 200 {
-			_ = resp.Response().Body.Close()
+			web.DrainAndClose(resp.Response().Body)
 			return nil, fmt.Errorf("failed retrieving valid movies api response: %s", resp.Response().Status)
 		}
 
@@ -497,21 +497,21 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		if !strings.Contains(endpoint, "/people/") {
 			// non person search
 			if err := resp.ToJSON(&s); err != nil {
-				_ = resp.Response().Body.Close()
+				web.DrainAndClose(resp.Response().Body)
 				return nil, errors.WithMessage(err, "failed decoding movies api response")
 			}
 		} else {
 			// person search
 			var tmp TraktPersonMovieCastResponse
 			if err := resp.ToJSON(&tmp); err != nil {
-				_ = resp.Response().Body.Close()
+				web.DrainAndClose(resp.Response().Body)
 				return nil, errors.WithMessage(err, "failed decoding person movies api response")
 			}
 
 			s = tmp.Cast
 		}
 
-		_ = resp.Response().Body.Close()
+		web.DrainAndClose(resp.Response().Body)
 
 		// process response
 		for _, item := range s {
@@ -682,7 +682,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 
 		// validate response
 		if resp.Response().StatusCode != 200 {
-			_ = resp.Response().Body.Close()
+			web.DrainAndClose(resp.Response().Body)
 			return nil, fmt.Errorf("failed retrieving valid shows api response: %s", resp.Response().Status)
 		}
 
@@ -692,21 +692,21 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 		if !strings.Contains(endpoint, "/people/") {
 			// non person search
 			if err := resp.ToJSON(&s); err != nil {
-				_ = resp.Response().Body.Close()
+				web.DrainAndClose(resp.Response().Body)
 				return nil, errors.WithMessage(err, "failed decoding shows api response")
 			}
 		} else {
 			// person search
 			var tmp TraktPersonShowCastResponse
 			if err := resp.ToJSON(&tmp); err != nil {
-				_ = resp.Response().Body.Close()
+				web.DrainAndClose(resp.Response().Body)
 				return nil, errors.WithMessage(err, "failed decoding person shows api response")
 			}
 
 			s = tmp.Cast
 		}
 
-		_ = resp.Response().Body.Close()
+		web.DrainAndClose(resp.Response().Body)
 
 		// process response
 		for _, item := range s {
