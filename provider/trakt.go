@@ -51,6 +51,7 @@ type TraktMovieIds struct {
 }
 
 type TraktMovie struct {
+	Type                  string        `json:"type"`
 	Title                 string        `json:"title"`
 	Year                  int           `json:"year"`
 	Ids                   TraktMovieIds `json:"ids"`
@@ -75,6 +76,7 @@ type TraktMovie struct {
 type TraktMoviesResponse struct {
 	TraktMovie
 	Character *string     `json:"character"`
+	Type      *string     `json:"type"`
 	Movie     *TraktMovie `json:"movie"`
 }
 
@@ -95,6 +97,7 @@ type TraktShowIds struct {
 }
 
 type TraktShow struct {
+	Type                  string       `json:"type"`
 	Title                 string       `json:"title"`
 	Year                  int          `json:"year"`
 	Ids                   TraktShowIds `json:"ids"`
@@ -120,6 +123,7 @@ type TraktShow struct {
 type TraktShowsResponse struct {
 	TraktShow
 	Character *string    `json:"character"`
+	Type      *string    `json:"type"`
 	Show      *TraktShow `json:"show"`
 }
 
@@ -382,10 +386,17 @@ func (p *Trakt) translateMovie(response TraktMoviesResponse) *TraktMovie {
 			m.Character = *response.Character
 		}
 
+		if response.Type != nil && *response.Type != "" {
+			m.Type = *response.Type
+		} else {
+			m.Type = "movie"
+		}
+
 		return m
 	}
 
 	return &TraktMovie{
+		Type:  "movie",
 		Title: response.Title,
 		Year:  response.Year,
 		Ids: TraktMovieIds{
@@ -420,10 +431,17 @@ func (p *Trakt) translateShow(response TraktShowsResponse) *TraktShow {
 			s.Character = *response.Character
 		}
 
+		if response.Type != nil && *response.Type != "" {
+			s.Type = *response.Type
+		} else {
+			s.Type = "show"
+		}
+
 		return s
 	}
 
 	return &TraktShow{
+		Type:  "show",
 		Title: response.Title,
 		Year:  response.Year,
 		Ids: TraktShowIds{
@@ -524,6 +542,8 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 
 			// skip this item?
 			if movieItem.Ids.Slug == "" {
+				continue
+			} else if movieItem.Type != "movie" {
 				continue
 			} else if movieItem.Ids.Tmdb == 0 {
 				continue
@@ -719,6 +739,8 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 
 			// skip this item?
 			if showItem.Ids.Slug == "" {
+				continue
+			} else if showItem.Type != "show" {
 				continue
 			} else if showItem.Ids.Tvdb == 0 {
 				continue
