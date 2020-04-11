@@ -23,7 +23,7 @@ require (
 	github.com/onsi/gomega v1.8.1 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/rhysd/go-github-selfupdate v1.2.1
+	github.com/rhysd/go-github-selfupdate v1.2.2
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
