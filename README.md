@@ -118,4 +118,6 @@ If you find this project helpful, feel free to make a small donation to the deve
 
   - [Paypal: l3uddz@gmail.com](https://www.paypal.me/l3uddz)
 
+  - [GitHub Sponsor](https://github.com/sponsors/l3uddz): GitHub matches contributions for first 12 months.
+
   - BTC: 3CiHME1HZQsNNcDL6BArG7PbZLa8zUUgjL

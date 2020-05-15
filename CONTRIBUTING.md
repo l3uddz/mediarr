@@ -7,7 +7,7 @@ Guide below will explain the process of submitting a pull request (PR).
 1. Clone your forked project:
 
    ```
-   git clone http://github.com/<your_github_username>/traktarr
+   git clone http://github.com/<your_github_username>/mediarr
    ```
 
 1. Create a feature branch off of the **develop** branch:
