@@ -24,4 +24,4 @@ jobs:
           version: v1.27
 
           # Optional: golangci-lint command line arguments.
-          args: --timeout 10m
+          args: --timeout 10m --enable bodyclose,goimports,unconvert,unparam,scopelint,dupl,interfacer,golint

@@ -32,7 +32,7 @@ test: ## Run tests
 .PHONY: lint
 lint: check_golangci ## Run linting
 	@echo "*** golangci-lint ***"
-	golangci-lint run --timeout 10m
+	golangci-lint run --timeout 10m --enable bodyclose,goimports,unconvert,unparam,scopelint,dupl,interfacer,golint
 
 .PHONY: vendor
 vendor: ## Vendor files and tidy go.mod
