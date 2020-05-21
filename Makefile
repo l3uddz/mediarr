@@ -9,10 +9,9 @@ DESTDIR        := /usr/local/bin
 GO_FILES       := $(shell find . -path ./vendor -prune -or -type f -name '*.go' -print)
 GO_PACKAGES    := $(shell go list -mod vendor ./...)
 GIT_COMMIT     := $(shell git rev-parse --short HEAD)
-# GIT_BRANCH     := $(shell git symbolic-ref --short HEAD)
 TIMESTAMP      := $(shell date +%s)
 VERSION        ?= 0.0.0-dev
-CGO			   := 1
+CGO            := 1
 
 # Deps
 .PHONY: check_golangci
@@ -77,10 +76,10 @@ release: fetch ## Generate a release, but don't publish
 			-e VERSION="${VERSION}" \
 			-e GIT_COMMIT="${GIT_COMMIT}" \
 			-e TIMESTAMP="${TIMESTAMP}" \
-            -v `pwd`:/go/src/github.com/l3uddz/mediarr \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -w /go/src/github.com/l3uddz/mediarr \
-            neilotoole/xcgo:latest goreleaser --skip-validate --skip-publish --rm-dist
+			-v `pwd`:/go/src/github.com/l3uddz/mediarr \
+			-v /var/run/docker.sock:/var/run/docker.sock \
+			-w /go/src/github.com/l3uddz/mediarr \
+			neilotoole/xcgo:latest goreleaser --skip-validate --skip-publish --rm-dist
 
 .PHONY: publish
 publish: fetch ## Generate a release, and publish
@@ -89,10 +88,10 @@ publish: fetch ## Generate a release, and publish
 			-e VERSION="${GIT_TAG_NAME}" \
 			-e GIT_COMMIT="${GIT_COMMIT}" \
 			-e TIMESTAMP="${TIMESTAMP}" \
-            -v `pwd`:/go/src/github.com/l3uddz/mediarr \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -w /go/src/github.com/l3uddz/mediarr \
-            neilotoole/xcgo:latest goreleaser --rm-dist
+			-v `pwd`:/go/src/github.com/l3uddz/mediarr \
+			-v /var/run/docker.sock:/var/run/docker.sock \
+			-w /go/src/github.com/l3uddz/mediarr \
+			neilotoole/xcgo:latest goreleaser --rm-dist
 
 .PHONY: snapshot
 snapshot: fetch ## Generate a snapshot release
@@ -100,10 +99,10 @@ snapshot: fetch ## Generate a snapshot release
 		-e VERSION="${VERSION}" \
 		-e GIT_COMMIT="${GIT_COMMIT}" \
 		-e TIMESTAMP="${TIMESTAMP}" \
-        -v `pwd`:/go/src/github.com/l3uddz/mediarr \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -w /go/src/github.com/l3uddz/mediarr \
-        neilotoole/xcgo:latest goreleaser --snapshot --skip-validate --skip-publish --rm-dist
+		-v `pwd`:/go/src/github.com/l3uddz/mediarr \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-w /go/src/github.com/l3uddz/mediarr \
+		neilotoole/xcgo:latest goreleaser --snapshot --skip-validate --skip-publish --rm-dist
 
 .PHONY: help
 help:
