@@ -6,14 +6,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/l3uddz/mediarr/build"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/database"
 	"github.com/l3uddz/mediarr/logger"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
+	"github.com/l3uddz/mediarr/release"
 	"github.com/l3uddz/mediarr/utils/paths"
 	stringutils "github.com/l3uddz/mediarr/utils/strings"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -85,6 +86,13 @@ func init() {
 }
 
 func initCore() {
+	// Env variables
+	cfgDirEnv := os.Getenv("MEDIARR_CONFIG_DIR")
+	if !rootCmd.PersistentFlags().Changed("config-dir") && cfgDirEnv != "" {
+		log.Infof("CFG ENV: %s", cfgDirEnv)
+		flagConfigFolder = cfgDirEnv
+	}
+
 	// Set core variables
 	if !rootCmd.PersistentFlags().Changed("config") {
 		flagConfigFile = filepath.Join(flagConfigFolder, flagConfigFile)
@@ -112,7 +120,7 @@ func initCore() {
 func showUsing() {
 	// version
 	log.Infof("Using %s = %s (%s@%s)", stringutils.StringLeftJust("VERSION", " ", 10),
-		build.Version, build.GitCommit, build.Timestamp)
+		release.Version, release.GitCommit, release.Timestamp)
 	// logging
 	logger.ShowUsing()
 	// config

@@ -88,3 +88,15 @@ jobs:
         with:
           name: build_windows
           path: dist/*windows*.zip
+
+      # docker build
+      - name: docker
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: cloudb0x/mediarr
+          dockerfile: build/Dockerfile
+          tag_with_ref: true
+          tag_with_sha: true
+          always_pull: true
