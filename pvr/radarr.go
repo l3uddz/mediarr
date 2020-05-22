@@ -322,7 +322,7 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 		}
 
 		if added {
-			itemsSize += 1
+			itemsSize++
 		}
 	}
 

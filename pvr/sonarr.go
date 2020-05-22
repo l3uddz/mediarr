@@ -297,7 +297,7 @@ func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	itemsSize := 0
 
 	for _, item := range s {
-		itemsSize += 1
+		itemsSize++
 
 		itemId := strconv.Itoa(item.TvdbId)
 		existingMediaItems[itemId] = config.MediaItem{

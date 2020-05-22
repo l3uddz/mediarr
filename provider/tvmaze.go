@@ -268,18 +268,18 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// does the pvr already have this item?
 		if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring existing: %+v", mediaItem)
-			existingItemsSize += 1
+			existingItemsSize++
 			continue
 		}
 
 		// item passes ignore expressions and is a valid tvdb item?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring: %+v", mediaItem)
-			ignoredItemsSize += 1
+			ignoredItemsSize++
 			continue
 		} else if !media.ValidateTvdbId(itemId) {
 			p.log.Debugf("Ignoring, bad TvdbId: %+v", mediaItem)
-			ignoredItemsSize += 1
+			ignoredItemsSize++
 			continue
 		} else {
 			p.log.Debugf("Accepted: %+v", mediaItem)
@@ -287,7 +287,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 
 		// set item
 		mediaItems[itemId] = mediaItem
-		mediaItemsSize += 1
+		mediaItemsSize++
 
 		// stop when limit reached
 		if limit > 0 && mediaItemsSize >= limit {

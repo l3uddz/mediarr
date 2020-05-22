@@ -91,7 +91,7 @@ var moviesCmd = &cobra.Command{
 
 		for _, m := range sortedMediaItems {
 			mediaItem := m
-			pos += 1
+			pos++
 
 			// skip when dry-run is enabled
 			if flagDryRun {

@@ -419,7 +419,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
-				existingItemsSize += 1
+				existingItemsSize++
 				continue
 			}
 
@@ -428,7 +428,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			//if err != nil {
 			//	// skip this item as it failed tmdb id validation
 			//	p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
-			//	ignoredItemsSize += 1
+			//	ignoredItemsSize++
 			//	continue
 			//} else {
 			//	// set additional movie details
@@ -440,7 +440,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 			// item passes ignore expressions?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
-				ignoredItemsSize += 1
+				ignoredItemsSize++
 				continue
 			} else {
 				p.log.Debugf("Accepted: %+v", mediaItem)
@@ -448,7 +448,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 
 			// set media item
 			mediaItems[itemId] = mediaItem
-			mediaItemsSize += 1
+			mediaItemsSize++
 
 			// stop when limit reached
 			if limit > 0 && mediaItemsSize >= limit {
@@ -475,7 +475,7 @@ func (p *Tmdb) getMovies(endpoint string, logic map[string]interface{}, params m
 		if s.Page >= s.TotalPages {
 			break
 		} else {
-			page += 1
+			page++
 		}
 	}
 
