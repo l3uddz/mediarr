@@ -1,8 +1,9 @@
 package media
 
 import (
-	"github.com/l3uddz/mediarr/config"
 	"sort"
+
+	"github.com/l3uddz/mediarr/config"
 )
 
 type SortType string

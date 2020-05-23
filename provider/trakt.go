@@ -6,12 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
+
+	"github.com/imroc/req"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/ratelimit"
@@ -606,18 +607,18 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
-				existingItemsSize += 1
+				existingItemsSize++
 				continue
 			}
 
 			// item passes ignore expressions?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
-				ignoredItemsSize += 1
+				ignoredItemsSize++
 				continue
 			} else if !media.ValidateTmdbId("movie", itemId) {
 				p.log.Debugf("Ignoring, invalid TmdbId: %+v", mediaItem)
-				ignoredItemsSize += 1
+				ignoredItemsSize++
 				continue
 			} else {
 				p.log.Debugf("Accepted: %+v", mediaItem)
@@ -625,7 +626,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 
 			// set media item
 			mediaItems[itemId] = mediaItem
-			mediaItemsSize += 1
+			mediaItemsSize++
 
 			// stop when limit reached
 			if limit > 0 && mediaItemsSize >= limit {
@@ -659,7 +660,7 @@ func (p *Trakt) getMovies(endpoint string, logic map[string]interface{}, params 
 		if page >= totalPages {
 			break
 		} else {
-			page += 1
+			page++
 		}
 	}
 
@@ -788,18 +789,18 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 			// does the pvr already have this item?
 			if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring existing: %+v", mediaItem)
-				existingItemsSize += 1
+				existingItemsSize++
 				continue
 			}
 
 			// item passes ignore expressions and is a valid tvdb item?
 			if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 				p.log.Debugf("Ignoring: %+v", mediaItem)
-				ignoredItemsSize += 1
+				ignoredItemsSize++
 				continue
 			} else if !media.ValidateTvdbId(itemId) {
 				p.log.Debugf("Ignoring, invalid TvdbId: %+v", mediaItem)
-				ignoredItemsSize += 1
+				ignoredItemsSize++
 				continue
 			} else {
 				p.log.Debugf("Accepted: %+v", mediaItem)
@@ -807,7 +808,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 
 			// set media item
 			mediaItems[itemId] = mediaItem
-			mediaItemsSize += 1
+			mediaItemsSize++
 
 			// stop when limit reached
 			if limit > 0 && mediaItemsSize >= limit {
@@ -841,7 +842,7 @@ func (p *Trakt) getShows(endpoint string, logic map[string]interface{}, params m
 		if page >= totalPages {
 			break
 		} else {
-			page += 1
+			page++
 		}
 	}
 

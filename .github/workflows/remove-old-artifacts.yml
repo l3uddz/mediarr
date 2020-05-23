@@ -1,5 +1,4 @@
-name: Remove old artifacts
-
+name: prune_artifacts
 on:
   schedule:
     # Every day at 1am

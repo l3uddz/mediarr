@@ -19,10 +19,9 @@ func Init(databaseFilePath string) error {
 	dbFilePath = databaseFilePath
 
 	// open database
-	if dtb, err := gorm.Open("sqlite3", databaseFilePath); err != nil {
+	var err error
+	if db, err = gorm.Open("sqlite3", databaseFilePath); err != nil {
 		return err
-	} else {
-		db = dtb
 	}
 
 	// migrate schema

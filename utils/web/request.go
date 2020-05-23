@@ -1,7 +1,6 @@
 package web
 
 import (
-	"go.uber.org/ratelimit"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"github.com/imroc/req"
 	"github.com/jpillora/backoff"
 	"github.com/pkg/errors"
+	"go.uber.org/ratelimit"
 )
 
 var (

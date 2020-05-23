@@ -1,5 +1,4 @@
-name: Build
-
+name: build
 on:
   push:
     branches:
@@ -16,29 +15,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # dependencies
-      - name: dependencies
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b /usr/local/bin v1.24.0
-
       # checkout
       - name: checkout
         uses: actions/checkout@v2
 
       # unshallow (for goreleaser)
       - name: unshallow
-        run: git fetch --prune --unshallow
+        run: git fetch --prune --unshallow --tags
 
       # setup go
       - name: go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.14.1
+          go-version: 1.14
 
-      # lint
-      - name: lint
-        run: |
-          make lint
+      - name: go_version
+        run: go version
 
       # test
       #- name: test
@@ -99,3 +91,15 @@ jobs:
         with:
           name: build_windows
           path: dist/*windows*.zip
+
+      # docker build
+      - name: docker
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: cloudb0x/mediarr
+          dockerfile: build/Dockerfile
+          tag_with_ref: true
+          tag_with_sha: true
+          always_pull: true

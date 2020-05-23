@@ -2,17 +2,19 @@ package pvr
 
 import (
 	"fmt"
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/vm"
-	"github.com/imroc/req"
-	"github.com/l3uddz/mediarr/config"
-	"github.com/l3uddz/mediarr/logger"
-	"github.com/l3uddz/mediarr/utils/web"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/l3uddz/mediarr/config"
+	"github.com/l3uddz/mediarr/logger"
+	"github.com/l3uddz/mediarr/utils/web"
+
+	"github.com/antonmedv/expr"
+	"github.com/antonmedv/expr/vm"
+	"github.com/imroc/req"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 /* Structs */
@@ -322,7 +324,7 @@ func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 		}
 
 		if added {
-			itemsSize += 1
+			itemsSize++
 		}
 	}
 
