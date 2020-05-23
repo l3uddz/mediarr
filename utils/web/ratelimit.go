@@ -1,10 +1,11 @@
 package web
 
 import (
-	"github.com/sirupsen/logrus"
-	"go.uber.org/ratelimit"
 	"strings"
 	"sync"
+
+	"github.com/sirupsen/logrus"
+	"go.uber.org/ratelimit"
 )
 
 var (

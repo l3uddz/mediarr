@@ -2,10 +2,12 @@ package provider
 
 import (
 	"fmt"
-	"github.com/jpillora/backoff"
-	"github.com/l3uddz/mediarr/utils/web"
 	"strings"
 	"time"
+
+	"github.com/l3uddz/mediarr/utils/web"
+
+	"github.com/jpillora/backoff"
 )
 
 var (

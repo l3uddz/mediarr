@@ -2,11 +2,13 @@ package media
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/l3uddz/mediarr/utils/web"
+
 	"github.com/imroc/req"
 	"github.com/jpillora/backoff"
-	"github.com/l3uddz/mediarr/utils/web"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type TraktSearchResponse []struct {

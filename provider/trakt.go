@@ -6,12 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imroc/req"
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
+
+	"github.com/imroc/req"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/ratelimit"

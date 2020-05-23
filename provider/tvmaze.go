@@ -2,16 +2,18 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/ratelimit"
-	"strconv"
-	"time"
 )
 
 /* Const */
@@ -191,7 +193,7 @@ func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, para
 
 /* Private - Sub-Implements */
 
-func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *TvMaze) getScheduleShows(logic map[string]interface{}, _ map[string]string) (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), p.timeout, &p.reqRetry,
 		p.reqRatelimit)
