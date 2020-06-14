@@ -1,10 +1,12 @@
 package paths
 
 import (
-	"github.com/l3uddz/mediarr/logger"
-	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+
+	"github.com/l3uddz/mediarr/logger"
+
+	"github.com/sirupsen/logrus"
 )
 
 var log = logger.GetLogger("paths")

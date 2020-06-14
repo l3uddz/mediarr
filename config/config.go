@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/json-iterator/go"
 	"os"
 
 	"github.com/l3uddz/mediarr/logger"
 	stringutils "github.com/l3uddz/mediarr/utils/strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )

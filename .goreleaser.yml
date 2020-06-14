@@ -6,7 +6,7 @@ env:
 
 # Build
 builds:
-  - id: build_macos
+  - id: build_darwin
     env:
       - CC=o64-clang
       - CXX=o64-clang++
@@ -61,7 +61,7 @@ builds:
 # Archive
 archives:
   -
-    builds: ['build_macos', 'build_linux', 'build_windows']
+    builds: ['build_darwin', 'build_linux', 'build_windows']
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format: "tar.gz"
     format_overrides:

@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"bufio"
+	"os"
+
 	"github.com/blang/semver"
-	"github.com/l3uddz/mediarr/build"
+	"github.com/l3uddz/mediarr/release"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var updateCmd = &cobra.Command{
@@ -19,9 +20,9 @@ var updateCmd = &cobra.Command{
 		initCore()
 
 		// parse current version
-		v, err := semver.Parse(build.Version)
+		v, err := semver.Parse(release.Version)
 		if err != nil {
-			log.WithError(err).Fatal("Failed parsing current build version")
+			log.WithError(err).Fatal("Failed parsing current version")
 		}
 
 		// detect latest version
@@ -33,7 +34,7 @@ var updateCmd = &cobra.Command{
 
 		// check version
 		if !found || latest.Version.LTE(v) {
-			log.Infof("Already using the latest version: %v", build.Version)
+			log.Infof("Already using the latest version: %v", release.Version)
 			return
 		}
 

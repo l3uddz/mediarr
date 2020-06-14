@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"github.com/l3uddz/mediarr/utils/strings"
 	"runtime"
+
+	"github.com/l3uddz/mediarr/utils/strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"

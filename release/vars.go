@@ -1,7 +1,7 @@
-package build
+package release
 
 var (
-	// Build Vars
+	// Release variables
 	Version   string
 	Timestamp string
 	GitCommit string

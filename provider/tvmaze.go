@@ -2,16 +2,18 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/l3uddz/mediarr/config"
 	"github.com/l3uddz/mediarr/logger"
 	"github.com/l3uddz/mediarr/utils/lists"
 	"github.com/l3uddz/mediarr/utils/media"
 	"github.com/l3uddz/mediarr/utils/web"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/ratelimit"
-	"strconv"
-	"time"
 )
 
 /* Const */
@@ -191,7 +193,7 @@ func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, para
 
 /* Private - Sub-Implements */
 
-func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[string]string) (map[string]config.MediaItem, error) {
+func (p *TvMaze) getScheduleShows(logic map[string]interface{}, _ map[string]string) (map[string]config.MediaItem, error) {
 	// send request
 	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), p.timeout, &p.reqRetry,
 		p.reqRatelimit)
@@ -268,18 +270,18 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 		// does the pvr already have this item?
 		if p.fnIgnoreExistingMediaItem != nil && p.fnIgnoreExistingMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring existing: %+v", mediaItem)
-			existingItemsSize += 1
+			existingItemsSize++
 			continue
 		}
 
 		// item passes ignore expressions and is a valid tvdb item?
 		if p.fnAcceptMediaItem != nil && !p.fnAcceptMediaItem(&mediaItem) {
 			p.log.Debugf("Ignoring: %+v", mediaItem)
-			ignoredItemsSize += 1
+			ignoredItemsSize++
 			continue
 		} else if !media.ValidateTvdbId(itemId) {
 			p.log.Debugf("Ignoring, bad TvdbId: %+v", mediaItem)
-			ignoredItemsSize += 1
+			ignoredItemsSize++
 			continue
 		} else {
 			p.log.Debugf("Accepted: %+v", mediaItem)
@@ -287,7 +289,7 @@ func (p *TvMaze) getScheduleShows(logic map[string]interface{}, params map[strin
 
 		// set item
 		mediaItems[itemId] = mediaItem
-		mediaItemsSize += 1
+		mediaItemsSize++
 
 		// stop when limit reached
 		if limit > 0 && mediaItemsSize >= limit {
