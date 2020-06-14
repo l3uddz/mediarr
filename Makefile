@@ -54,7 +54,7 @@ ${BUILD_PATH}/${CMD}: ${GO_FILES} go.sum
 	CGO_ENABLED=${CGO} go build \
 		-mod vendor \
 		-trimpath \
-		-ldflags "-s -w -X github.com/l3uddz/mediarr/build.Version=${VERSION} -X github.com/l3uddz/mediarr/build.GitCommit=${GIT_COMMIT} -X github.com/l3uddz/mediarr/build.Timestamp=${TIMESTAMP}" \
+		-ldflags "-s -w -X github.com/l3uddz/mediarr/release.Version=${VERSION} -X github.com/l3uddz/mediarr/release.GitCommit=${GIT_COMMIT} -X github.com/l3uddz/mediarr/release.Timestamp=${TIMESTAMP}" \
 		-o ${BUILD_PATH}/${CMD} \
 		.
 
