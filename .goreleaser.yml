@@ -17,9 +17,9 @@ builds:
       - amd64
     ldflags:
       - -s -w
-      - -X "github.com/l3uddz/mediarr/build.Version={{ .Version }}"
-      - -X "github.com/l3uddz/mediarr/build.GitCommit={{ .ShortCommit }}"
-      - -X "github.com/l3uddz/mediarr/build.Timestamp={{ .Timestamp }}"
+      - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
+      - -X "github.com/l3uddz/mediarr/release.GitCommit={{ .ShortCommit }}"
+      - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
     flags:
       - -trimpath
 
@@ -33,9 +33,9 @@ builds:
       - -linkmode external
       - -extldflags -static
       - -s -w
-      - -X "github.com/l3uddz/mediarr/build.Version={{ .Version }}"
-      - -X "github.com/l3uddz/mediarr/build.GitCommit={{ .ShortCommit }}"
-      - -X "github.com/l3uddz/mediarr/build.Timestamp={{ .Timestamp }}"
+      - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
+      - -X "github.com/l3uddz/mediarr/release.GitCommit={{ .ShortCommit }}"
+      - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
     flags:
       - -trimpath
       - -tags=netgo
@@ -52,9 +52,9 @@ builds:
       - amd64
     ldflags:
       - -s -w
-      - -X "github.com/l3uddz/mediarr/build.Version={{ .Version }}"
-      - -X "github.com/l3uddz/mediarr/build.GitCommit={{ .ShortCommit }}"
-      - -X "github.com/l3uddz/mediarr/build.Timestamp={{ .Timestamp }}"
+      - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
+      - -X "github.com/l3uddz/mediarr/release.GitCommit={{ .ShortCommit }}"
+      - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
     flags:
       - -trimpath
 
