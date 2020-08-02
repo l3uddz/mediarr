@@ -58,6 +58,7 @@ builds:
     flags:
       - -trimpath
 
+# Archives
 archives:
   -
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
