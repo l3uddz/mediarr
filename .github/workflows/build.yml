@@ -70,19 +70,19 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_linux
-          path: dist/*linux*.tar.gz
+          path: dist/*linux*
 
       - name: artifact_darwin
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_darwin
-          path: dist/*darwin*.tar.gz
+          path: dist/*darwin*
 
       - name: artifact_windows
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_windows
-          path: dist/*windows*.zip
+          path: dist/*windows*
 
       # docker build
       - name: docker
