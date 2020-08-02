@@ -58,15 +58,10 @@ builds:
     flags:
       - -trimpath
 
-# Archive
 archives:
   -
-    builds: ['build_darwin', 'build_linux', 'build_windows']
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: "tar.gz"
-    format_overrides:
-      - goos: windows
-        format: zip
+    format: "binary"
 
 # Checksum
 checksum:
