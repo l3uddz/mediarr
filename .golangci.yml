@@ -4,7 +4,7 @@ run:
 linters:
   enable:
     - bodyclose
-    - goimports
+    # - goimports
     - unconvert
     # - unparam
     - scopelint
