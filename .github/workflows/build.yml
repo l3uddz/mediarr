@@ -18,24 +18,16 @@ jobs:
       # checkout
       - name: checkout
         uses: actions/checkout@v2
-
-      # unshallow (for goreleaser)
-      - name: unshallow
-        run: git fetch --prune --unshallow --tags
+        with:
+          fetch-depth: 0
 
       # setup go
       - name: go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v1
         with:
           go-version: 1.14
-
-      - name: go_version
-        run: go version
-
-      # test
-      #- name: test
-      #  run: |
-      #    make test
+      - run: go version
+      - run: go env
 
       # cache
       - name: cache
@@ -78,19 +70,19 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_linux
-          path: dist/*linux*.tar.gz
+          path: dist/*linux*
 
       - name: artifact_darwin
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_darwin
-          path: dist/*darwin*.tar.gz
+          path: dist/*darwin*
 
       - name: artifact_windows
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_windows
-          path: dist/*windows*.zip
+          path: dist/*windows*
 
       # docker build
       - name: docker

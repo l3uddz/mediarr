@@ -1,7 +1,6 @@
 package database
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 )
 
@@ -10,7 +9,7 @@ func GetMetadataItem(provider string, itemId string) (*string, error) {
 
 	// does item already exist?
 	err := db.First(&existingItem, "provider = ? AND id = ?", provider, itemId).Error
-	if gorm.IsRecordNotFoundError(err) {
+	if err != nil {
 		return nil, errors.WithMessage(err, "metadata item not found")
 	}
 
