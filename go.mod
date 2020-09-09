@@ -3,7 +3,7 @@ module github.com/l3uddz/mediarr
 go 1.13
 
 require (
-	github.com/antonmedv/expr v1.8.8
+	github.com/antonmedv/expr v1.8.9
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
