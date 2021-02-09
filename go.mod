@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/antonmedv/expr v1.8.8
-	github.com/blang/semver v3.5.1+incompatible
+	github.com/blang/semver v3.8.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/imroc/req v0.3.0
