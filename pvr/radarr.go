@@ -154,8 +154,8 @@ func (p *Radarr) Init(mediaType MediaType) error {
 	}
 
 	// validate supported version
-	switch status.Version[0:3] {
-	case "0.2", "3.0":
+	switch status.Version[0:1] {
+	case "0", "3":
 		break
 	default:
 		return fmt.Errorf("unsupported version of radarr pvr: %s", status.Version)
