@@ -32,7 +32,7 @@ require (
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	go.uber.org/atomic v1.5.1 // indirect
-	go.uber.org/ratelimit v0.1.0
+	go.uber.org/ratelimit v0.2.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	golang.org/x/net v0.0.0-20210220033124-5f55cee0dc0d // indirect
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93 // indirect
