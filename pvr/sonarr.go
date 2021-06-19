@@ -20,12 +20,13 @@ import (
 /* Structs */
 
 type Sonarr struct {
-	cfg              *config.Pvr
-	log              *logrus.Entry
-	apiUrl           string
-	reqHeaders       req.Header
-	qualityProfileId int
-	timeout          int
+	cfg               *config.Pvr
+	log               *logrus.Entry
+	apiUrl            string
+	reqHeaders        req.Header
+	qualityProfileId  int
+	languageProfileId int
+	timeout           int
 
 	ignoresExpr []*vm.Program
 }
@@ -39,6 +40,11 @@ type SonarrQualityProfiles struct {
 	Id   int
 }
 
+type SonarrLanguageProfiles struct {
+	Name string
+	Id   int
+}
+
 type SonarrSeries struct {
 	Title  string
 	Status string
@@ -46,19 +52,20 @@ type SonarrSeries struct {
 }
 
 type SonarrAddRequest struct {
-	Title            string           `json:"title"`
-	TitleSlug        string           `json:"titleSlug"`
-	Year             int              `json:"year"`
-	QualityProfileId int              `json:"qualityProfileId"`
-	Images           []string         `json:"images"`
-	Tags             []string         `json:"tags"`
-	Monitored        bool             `json:"monitored"`
-	RootFolderPath   string           `json:"rootFolderPath"`
-	AddOptions       SonarrAddOptions `json:"addOptions"`
-	Seasons          []string         `json:"seasons"`
-	SeriesType       string           `json:"seriesType"`
-	SeasonFolder     bool             `json:"seasonFolder"`
-	TvdbId           int              `json:"tvdbId"`
+	Title             string           `json:"title"`
+	TitleSlug         string           `json:"titleSlug"`
+	Year              int              `json:"year"`
+	QualityProfileId  int              `json:"qualityProfileId"`
+	LanguageProfileId int              `json:"languageProfileId"`
+	Images            []string         `json:"images"`
+	Tags              []string         `json:"tags"`
+	Monitored         bool             `json:"monitored"`
+	RootFolderPath    string           `json:"rootFolderPath"`
+	AddOptions        SonarrAddOptions `json:"addOptions"`
+	Seasons           []string         `json:"seasons"`
+	SeriesType        string           `json:"seriesType"`
+	SeasonFolder      bool             `json:"seasonFolder"`
+	TvdbId            int              `json:"tvdbId"`
 }
 
 type SonarrAddOptions struct {
@@ -75,7 +82,7 @@ func NewSonarr(name string, c *config.Pvr) *Sonarr {
 	if strings.Contains(c.URL, "/api") {
 		apiUrl = c.URL
 	} else {
-		apiUrl = web.JoinURL(c.URL, "/api")
+		apiUrl = web.JoinURL(c.URL, "api", "v3")
 	}
 
 	// set headers
@@ -93,29 +100,6 @@ func NewSonarr(name string, c *config.Pvr) *Sonarr {
 }
 
 /* Private */
-
-func (p *Sonarr) getSystemStatus() (*SonarrSystemStatus, error) {
-	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), p.timeout, p.reqHeaders,
-		&pvrDefaultRetry)
-	if err != nil {
-		return nil, errors.New("failed retrieving system status api response")
-	}
-	defer web.DrainAndClose(resp.Response().Body)
-
-	// validate response
-	if resp.Response().StatusCode != 200 {
-		return nil, fmt.Errorf("failed retrieving valid system status api response: %s", resp.Response().Status)
-	}
-
-	// decode response
-	var s SonarrSystemStatus
-	if err := resp.ToJSON(&s); err != nil {
-		return nil, errors.WithMessage(err, "failed decoding system status api response")
-	}
-
-	return &s, nil
-}
 
 func (p *Sonarr) compileExpressions() error {
 	exprEnv := &config.ExprEnv{}
@@ -149,20 +133,6 @@ func (p *Sonarr) Init(mediaType MediaType) error {
 		return err
 	}
 
-	// retrieve system status
-	status, err := p.getSystemStatus()
-	if err != nil {
-		return errors.WithMessage(err, "failed initializing sonarr pvr")
-	}
-
-	// validate supported version
-	switch status.Version[0:1] {
-	case "2", "3":
-		break
-	default:
-		return fmt.Errorf("unsupported version of sonarr pvr: %s", status.Version)
-	}
-
 	// find quality profile
 	if id, err := p.GetQualityProfileId(p.cfg.QualityProfile); err != nil {
 		return err
@@ -173,6 +143,18 @@ func (p *Sonarr) Init(mediaType MediaType) error {
 			"quality_name": p.cfg.QualityProfile,
 			"quality_id":   p.qualityProfileId,
 		}).Info("Found quality profile")
+	}
+
+	// find language profile
+	if id, err := p.GetLanguageProfileId(p.cfg.LanguageProfile); err != nil {
+		return err
+	} else {
+		p.languageProfileId = id
+
+		p.log.WithFields(logrus.Fields{
+			"language_name": p.cfg.LanguageProfile,
+			"language_id":   p.languageProfileId,
+		}).Info("Found language profile")
 	}
 
 	return nil
@@ -202,7 +184,7 @@ func (p *Sonarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 
 func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "qualityprofile"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return 0, errors.New("failed retrieving quality profiles api response")
@@ -230,6 +212,36 @@ func (p *Sonarr) GetQualityProfileId(profileName string) (int, error) {
 	return 0, fmt.Errorf("failed finding quality profile: %q", profileName)
 }
 
+func (p *Sonarr) GetLanguageProfileId(profileName string) (int, error) {
+	// send request
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "languageprofile"), p.timeout, p.reqHeaders,
+		&pvrDefaultRetry)
+	if err != nil {
+		return 0, errors.New("failed retrieving language profiles api response")
+	}
+	defer web.DrainAndClose(resp.Response().Body)
+
+	// validate response
+	if resp.Response().StatusCode != 200 {
+		return 0, fmt.Errorf("failed retrieving valid language profiles api response: %s", resp.Response().Status)
+	}
+
+	// decode response
+	var s []SonarrLanguageProfiles
+	if err := resp.ToJSON(&s); err != nil {
+		return 0, errors.WithMessage(err, "failed decoding language profiles api response")
+	}
+
+	// find language profile
+	for _, profile := range s {
+		if strings.EqualFold(profile.Name, profileName) {
+			return profile.Id, nil
+		}
+	}
+
+	return 0, fmt.Errorf("failed finding language profile: %q", profileName)
+}
+
 func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 	// convert TvdbId to int
 	tvdbId, err := strconv.Atoi(item.TvdbId)
@@ -239,14 +251,15 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 
 	// set request params
 	params := SonarrAddRequest{
-		Title:            item.Title,
-		TitleSlug:        item.Slug,
-		Year:             item.Year,
-		QualityProfileId: p.qualityProfileId,
-		Images:           []string{},
-		Tags:             []string{},
-		Monitored:        true,
-		RootFolderPath:   p.cfg.RootFolder,
+		Title:             item.Title,
+		TitleSlug:         item.Slug,
+		Year:              item.Year,
+		QualityProfileId:  p.qualityProfileId,
+		LanguageProfileId: p.languageProfileId,
+		Images:            []string{},
+		Tags:              []string{},
+		Monitored:         true,
+		RootFolderPath:    p.cfg.RootFolder,
 		AddOptions: SonarrAddOptions{
 			SearchForMissingEpisodes:   true,
 			IgnoreEpisodesWithFiles:    false,
@@ -259,7 +272,7 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/series"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "series"), p.timeout, p.reqHeaders,
 		req.BodyJSON(params))
 	if err != nil {
 		return errors.New("failed retrieving add series api response")
@@ -276,7 +289,7 @@ func (p *Sonarr) AddMedia(item *config.MediaItem) error {
 
 func (p *Sonarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/series"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "series"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving series api response")
