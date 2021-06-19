@@ -73,7 +73,7 @@ func NewRadarr(name string, c *config.Pvr) *Radarr {
 	if strings.Contains(c.URL, "/api") {
 		apiUrl = c.URL
 	} else {
-		apiUrl = web.JoinURL(c.URL, "/api")
+		apiUrl = web.JoinURL(c.URL, "api", "v3")
 	}
 
 	// set headers
@@ -91,29 +91,6 @@ func NewRadarr(name string, c *config.Pvr) *Radarr {
 }
 
 /* Private */
-
-func (p *Radarr) getSystemStatus() (*RadarrSystemStatus, error) {
-	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/system/status"), p.timeout, p.reqHeaders,
-		&pvrDefaultRetry)
-	if err != nil {
-		return nil, errors.New("failed retrieving system status api response")
-	}
-	defer web.DrainAndClose(resp.Response().Body)
-
-	// validate response
-	if resp.Response().StatusCode != 200 {
-		return nil, fmt.Errorf("failed retrieving valid system status api response: %s", resp.Response().Status)
-	}
-
-	// decode response
-	var s RadarrSystemStatus
-	if err := resp.ToJSON(&s); err != nil {
-		return nil, errors.WithMessage(err, "failed decoding system status api response")
-	}
-
-	return &s, nil
-}
 
 func (p *Radarr) compileExpressions() error {
 	exprEnv := &config.ExprEnv{}
@@ -145,20 +122,6 @@ func (p *Radarr) Init(mediaType MediaType) error {
 	// compile and validate filter expressions
 	if err := p.compileExpressions(); err != nil {
 		return err
-	}
-
-	// retrieve system status
-	status, err := p.getSystemStatus()
-	if err != nil {
-		return errors.WithMessage(err, "failed initializing radarr pvr")
-	}
-
-	// validate supported version
-	switch status.Version[0:1] {
-	case "0", "3":
-		break
-	default:
-		return fmt.Errorf("unsupported version of radarr pvr: %s", status.Version)
 	}
 
 	// find quality profile
@@ -200,7 +163,7 @@ func (p *Radarr) ShouldIgnore(mediaItem *config.MediaItem) (bool, error) {
 
 func (p *Radarr) GetQualityProfileId(profileName string) (int, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/profile"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "qualityprofile"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return 0, errors.New("failed retrieving quality profiles api response")
@@ -254,7 +217,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "/movie"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.POST, web.JoinURL(p.apiUrl, "movie"), p.timeout, p.reqHeaders,
 		req.BodyJSON(params))
 	if err != nil {
 		return errors.New("failed retrieving add movies api response")
@@ -271,7 +234,7 @@ func (p *Radarr) AddMedia(item *config.MediaItem) error {
 
 func (p *Radarr) GetExistingMedia() (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie"), p.timeout, p.reqHeaders,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "movie"), p.timeout, p.reqHeaders,
 		&pvrDefaultRetry)
 	if err != nil {
 		return nil, errors.New("failed retrieving movies api response")

@@ -18,6 +18,7 @@ pvr:
     url: https://sonarr.domain.com
     api_key: your-api-key
     quality_profile: WEBDL-1080p
+    language_profile: English
     root_folder: /mnt/unionfs/Media/TV
     filters:
       ignores:

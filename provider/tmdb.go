@@ -252,7 +252,7 @@ func (p *Tmdb) loadGenres() error {
 	}
 
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/genre/movie/list"), p.timeout, params,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "genre", "movie", "list"), p.timeout, params,
 		&providerDefaultTimeout, p.reqRatelimit)
 	if err != nil {
 		return errors.WithMessage(err, "failed retrieving genres api response")
@@ -299,7 +299,7 @@ func (p *Tmdb) loadGenres() error {
 //	}
 //
 //	// send request
-//	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/movie/"+tmdbId), p.timeout, params,
+//	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "movie", tmdbId), p.timeout, params,
 //		&providerDefaultTimeout, p.reqRatelimit)
 //	if err != nil {
 //		return nil, errors.WithMessage(err, "failed retrieving movie details api response")
