@@ -195,7 +195,7 @@ func (p *TvMaze) GetMovies(searchType string, logic map[string]interface{}, para
 
 func (p *TvMaze) getScheduleShows(logic map[string]interface{}, _ map[string]string) (map[string]config.MediaItem, error) {
 	// send request
-	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "/schedule/full"), p.timeout, &p.reqRetry,
+	resp, err := web.GetResponse(web.GET, web.JoinURL(p.apiUrl, "schedule", "full"), p.timeout, &p.reqRetry,
 		p.reqRatelimit)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed retrieving full schedule api response")
