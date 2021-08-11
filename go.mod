@@ -3,7 +3,7 @@ module github.com/l3uddz/mediarr
 go 1.13
 
 require (
-	github.com/antonmedv/expr v1.8.9
+	github.com/antonmedv/expr v1.9.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/imroc/req v0.3.0
