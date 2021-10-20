@@ -9,7 +9,7 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jpillora/backoff v1.0.0
-	github.com/json-iterator/go v1.1.11
+	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
