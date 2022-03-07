@@ -6,7 +6,7 @@ require (
 	github.com/antonmedv/expr v1.8.9
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/imroc/req v0.3.0
+	github.com/imroc/req v0.3.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jpillora/backoff v1.0.0
 	github.com/json-iterator/go v1.1.11
