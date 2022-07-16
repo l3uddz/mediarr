@@ -1,20 +1,31 @@
-name: build
+name: Build
+
 on:
   push:
     branches:
-      - master
-      - develop
+      - '*'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - master
-      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # dependencies
+      - name: goreleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          install-only: true
+
+      - name: goreleaser info
+        run: goreleaser -v
+
+      - name: task
+        uses: arduino/setup-task@v1
+
+      - name: task info
+        run: task --version
+
       # checkout
       - name: checkout
         uses: actions/checkout@v2
@@ -25,48 +36,61 @@ jobs:
       - name: go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.16
-      - run: go version
-      - run: go env
+          go-version: 1.18
+
+      - name: go info
+        run: |
+          go version
+          go env
 
       # cache
-      - name: cache
-        uses: actions/cache@v1
+      - name: cache-paths
+        id: go-cache-paths
+        run: |
+          echo "::set-output name=go-build::$(go env GOCACHE)"
+          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+
+      - name: cache-build
+        uses: actions/cache@v2
         with:
-          path: vendor
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+
+      - name: cache-mod
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-mod }}
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+
+      - name: cache-task
+        uses: actions/cache@v2
+        with:
+          path: .task/**/*
+          key: ${{ runner.os }}-go-task
 
       # vendor
       - name: vendor
         run: |
-          make vendor
+          task vendor
 
       # git status
-      - run: git status
+      - name: git status
+        run: git status
 
       # build
       - name: build
         if: startsWith(github.ref, 'refs/tags/') == false
         run: |
-          make snapshot
-
-      # get tag name
-      - name: tag_name
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: little-core-labs/get-git-tag@v3.0.2
-        with:
-          tagRegex: "v?(.+)"
+          task snapshot
 
       # publish
       - name: publish
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REF: ${{ github.ref }}
         run: |
-          make publish
+          task publish
 
       # artifacts
       - name: artifact_linux
@@ -86,15 +110,3 @@ jobs:
         with:
           name: build_windows
           path: dist/*windows*
-
-      # docker build
-      - name: docker
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: cloudb0x/mediarr
-          dockerfile: build/Dockerfile
-          tag_with_ref: true
-          tag_with_sha: true
-          always_pull: true

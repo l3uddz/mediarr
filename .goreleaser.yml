@@ -1,55 +1,20 @@
 # https://goreleaser.com
 project_name: mediarr
-env:
-  - GO111MODULE=on
-  - CGO_ENABLED=1
 
 # Build
 builds:
-  - id: build_darwin
+  -
     env:
-      - CC=o64-clang
-      - CXX=o64-clang++
-    main: ./main.go
-    goos:
-      - darwin
-    goarch:
-      - amd64
-    ldflags:
-      - -s -w
-      - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
-      - -X "github.com/l3uddz/mediarr/release.GitCommit={{ .ShortCommit }}"
-      - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
-    flags:
-      - -trimpath
-
-  - id: build_linux
-    main: ./main.go
+      - CGO_ENABLED=0
     goos:
       - linux
-    goarch:
-      - amd64
-    ldflags:
-      - -linkmode external
-      - -extldflags -static
-      - -s -w
-      - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
-      - -X "github.com/l3uddz/mediarr/release.GitCommit={{ .ShortCommit }}"
-      - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
-    flags:
-      - -trimpath
-      - -tags=netgo
-      - -v
-
-  - id: build_windows
-    env:
-      - CC=x86_64-w64-mingw32-gcc
-      - CXX=x86_64-w64-mingw32-g++
-    main: ./main.go
-    goos:
+      - darwin
       - windows
+      - freebsd
+    main: .
     goarch:
       - amd64
+      - arm64
     ldflags:
       - -s -w
       - -X "github.com/l3uddz/mediarr/release.Version={{ .Version }}"
@@ -57,11 +22,21 @@ builds:
       - -X "github.com/l3uddz/mediarr/release.Timestamp={{ .Timestamp }}"
     flags:
       - -trimpath
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: freebsd
+        goarch: arm64
 
-# Archives
+# MacOS Universal Binaries
+universal_binaries:
+  -
+    replace: true
+
+# Archive
 archives:
   -
-    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
     format: "binary"
 
 # Checksum
@@ -71,11 +46,10 @@ checksum:
 
 # Snapshot
 snapshot:
-  name_template: "{{ .Major }}.{{ .Minor }}.{{ .Patch }}-dev+{{ .ShortCommit }}"
+  name_template: "{{ .Major }}.{{ .Minor }}.{{ .Patch }}-dev+{{ .Branch }}"
 
 # Changelog
 changelog:
-  sort: asc
   filters:
     exclude:
       - "^docs:"

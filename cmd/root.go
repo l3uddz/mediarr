@@ -62,7 +62,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "mediarr",
-	Short: "A CLI application to find new media for the arr sute",
+	Short: "A CLI application to find new media for the arr suite",
 	Long: `A CLI application that can be used to add new media to the arr suite.
 `,
 }

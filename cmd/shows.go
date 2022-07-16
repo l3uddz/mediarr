@@ -3,11 +3,12 @@ package cmd
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/l3uddz/mediarr/database"
 	providerObj "github.com/l3uddz/mediarr/provider"
 	pvrObj "github.com/l3uddz/mediarr/pvr"
 	"github.com/l3uddz/mediarr/utils/media"
-	"github.com/spf13/cobra"
 )
 
 var showsCmd = &cobra.Command{
@@ -32,7 +33,6 @@ var showsCmd = &cobra.Command{
 		if err := database.Init(flagDatabaseFile); err != nil {
 			log.WithError(err).Fatal("Failed opening database file")
 		}
-		defer database.Close()
 
 		// init provider object
 		if err := provider.Init(providerObj.Show, providerCfg); err != nil {
