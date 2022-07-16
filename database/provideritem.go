@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func ExistsValidatedProviderItem(provider string, itemId string) bool {

@@ -1,9 +1,11 @@
 package database
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/glebarez/sqlite"
 	jsoniter "github.com/json-iterator/go"
+	"gorm.io/gorm"
+	gcl "gorm.io/gorm/logger"
+
 	"github.com/l3uddz/mediarr/logger"
 	stringutils "github.com/l3uddz/mediarr/utils/strings"
 )
@@ -18,16 +20,20 @@ var (
 func Init(databaseFilePath string) error {
 	dbFilePath = databaseFilePath
 
+	// prepare gorm config
+	gc := &gorm.Config{
+		PrepareStmt: true,
+	}
+	gc.Logger = gcl.Default.LogMode(gcl.Silent)
+
 	// open database
 	var err error
-	if db, err = gorm.Open("sqlite3", databaseFilePath); err != nil {
+	if db, err = gorm.Open(sqlite.Open(databaseFilePath), gc); err != nil {
 		return err
 	}
 
 	// migrate schema
-	db.AutoMigrate(&ValidatedProviderItem{}, &ProviderItemMetadata{})
-
-	return nil
+	return db.AutoMigrate(&ValidatedProviderItem{}, &ProviderItemMetadata{})
 }
 
 func ShowUsing(databaseFilePath *string) {
@@ -38,10 +44,4 @@ func ShowUsing(databaseFilePath *string) {
 	}
 
 	log.Infof("Using %s = %q", stringutils.StringLeftJust("DATABASE", " ", 10), dbFilePath)
-}
-
-func Close() {
-	if err := db.Close(); err != nil {
-		log.WithError(err).Error("Failed closing database gracefully...")
-	}
 }

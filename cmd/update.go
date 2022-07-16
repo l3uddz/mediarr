@@ -5,9 +5,10 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	"github.com/l3uddz/mediarr/release"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
+
+	"github.com/l3uddz/mediarr/release"
 )
 
 var updateCmd = &cobra.Command{
